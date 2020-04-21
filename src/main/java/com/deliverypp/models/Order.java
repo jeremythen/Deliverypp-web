@@ -27,7 +27,6 @@ public class Order {
     @Column(nullable = false, length = 50)
     private String status;
 
-    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "location_id", nullable = false)
     @JsonBackReference

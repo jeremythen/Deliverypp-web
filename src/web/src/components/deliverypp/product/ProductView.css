@@ -1,0 +1,15 @@
+
+.ProductView {
+    
+}
+
+.ProductCardContainer {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-evenly;
+    padding: 10px;
+}
+
+.ProductTableContainer {
+    padding: 10px;
+}

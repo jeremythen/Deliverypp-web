@@ -1,0 +1,15 @@
+.App {
+  display: block;
+  height: 100vh;
+}
+
+.Footer {
+  position: absolute;
+  bottom: 0;
+}
+
+
+.DeliveryppTab {
+  display: flex;
+
+}
