@@ -7,7 +7,7 @@ function ProductCard(props) {
     return (
         <div className="ProductCard m-1 p-2">
             <Card style={{ width: '18rem' }}>
-                <Card.Img variant="top" src={props.imgSrc} />
+                <Card.Img variant="top" src={props.imageUrl} />
                 <Card.Body>
                     <Card.Title>{props.category}</Card.Title>
                     <Card.Text>

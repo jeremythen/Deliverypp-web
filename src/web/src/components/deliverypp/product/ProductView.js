@@ -1,14 +1,37 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import ProductCard from './ProductCard';
 import ProductTable from './ProductTable';
 
-import './ProductView.css'
+import './ProductView.css';
+
+import axios from 'axios';
 
 function ProductView() {
 
     const [cardView, setCardView] = useState(true);
+
+    const [products, setProducts] = useState([]);
+
+    useEffect(() => {
+
+        const fetchData = async () => {
+
+            const response = await axios.get('http://localhost:8080/api/product');
+
+            const deliveryppResponse = response.data;
+
+            if(deliveryppResponse.status === "SUCCESS") {
+                setProducts(deliveryppResponse.response);
+            } else {
+                console.error('Error getting products.');
+            }
+        }
+
+        fetchData();
+
+    }, products);
 
     const getProductCards = () => {
         return products.map(product => {

@@ -19,7 +19,6 @@ public class OrderLine {
     @JsonBackReference
     private Order order;
 
-    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "product_id")
     @JsonBackReference

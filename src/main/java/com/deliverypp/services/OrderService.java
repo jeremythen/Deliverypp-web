@@ -3,18 +3,22 @@ package com.deliverypp.services;
 import com.deliverypp.controllers.OrderController;
 import com.deliverypp.models.*;
 import com.deliverypp.repositories.*;
+import com.deliverypp.util.OrderStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static java.util.Objects.*;
+
+import com.deliverypp.util.DeliveryppResponse;
+
+import javax.validation.Valid;
+
+import static com.deliverypp.util.DeliveryppResponse.*;
 
 @Service
 public class OrderService {
@@ -36,9 +40,45 @@ public class OrderService {
     @Autowired
     private ProductRepository productRepository;
 
-    public Map<String, Object> createOrder(Map<String, Object> requestMap) {
+    public DeliveryppResponse<List<Order>> getOrders() {
+
+        List<Order> orders = orderRepository.findAll();
+
+        DeliveryppResponse<List<Order>> response = new DeliveryppResponse<>();
+
+        response
+                .setStatus(SUCCESS)
+                .setMessage("Success retrieving orders.")
+                .setResponse(orders);
+
+        return response;
+    }
+
+    public DeliveryppResponse<Order> getOrderById(int id) {
+
+        Optional<Order> optionalOrder = orderRepository.findById(id);
+
+        DeliveryppResponse<Order> response = new DeliveryppResponse<>();
+
+        if(optionalOrder.isPresent()) {
+            response
+                    .setStatus(SUCCESS)
+                    .setMessage("Successfully retrieved order with id: " + id)
+                    .setResponse(optionalOrder.get());
+        } else {
+            response.setStatus(ERROR)
+                    .setMessage("No order with id: " + id);
+        }
+
+        return response;
+
+    }
+
+    public DeliveryppResponse<Order> createOrder(Map<String, Object> requestMap) {
 
         logger.info("createOrder: " + requestMap);
+
+        DeliveryppResponse<Order> response = new DeliveryppResponse<>();
 
         Map<String, Object> responseMap = new HashMap<>();
 
@@ -59,13 +99,32 @@ public class OrderService {
 
             Optional<User> optionalUser = userRepository.findById(userId);
 
-            User user = optionalUser.get();
+            User user = null;
+
+            if(optionalUser.isPresent()) {
+                user = optionalUser.get();
+            } else {
+                response
+                        .setStatus(ERROR)
+                        .setMessage("User not found.");
+            }
 
             Location location = new Location();
 
-            location.setLatitude(locationMap.get("latitude"));
+            Double longitude = (Double) locationMap.get("longitude");
+            Double latitude = (Double) locationMap.get("latitude");
 
-            location.setLatitude(locationMap.get("longitude"));
+            if(isNull(latitude) || isNull(longitude)) {
+                response
+                        .setStatus(ERROR)
+                        .setMessage("Longitude and Latitude required.");
+
+                return response;
+            }
+
+            location.setLatitude(latitude);
+
+            location.setLatitude(longitude);
 
             location.setUser(user);
 
@@ -83,17 +142,37 @@ public class OrderService {
 
             if(isNull(newOrder)) {
                 logger.error("newOrder was not saved.");
-                // TODO: Return an error, order cannot proceed anymore.
+
+                response
+                        .setStatus(ERROR)
+                        .setMessage("Error saving order.");
+
+                return response;
+
             }
 
-            orderedProducts.forEach(orderedProduct -> {
+            if(orderedProducts.size() == 0) {
+                response
+                        .setStatus(ERROR)
+                        .setMessage("No products selected.");
+            }
 
+            for(Map<String, Integer> orderedProduct : orderedProducts) {
                 int id = orderedProduct.get("id");
                 int quantity = orderedProduct.get("quantity");
 
                 Optional<Product> optionalProduct = productRepository.findById(id);
 
-                Product product = optionalProduct.get();
+                Product product = null;
+
+                if(optionalProduct.isPresent()) {
+                    product = optionalProduct.get();
+                } else {
+                    response
+                            .setStatus(ERROR)
+                            .setMessage("Product not available.");
+                    return response;
+                }
 
                 OrderLine orderLine = new OrderLine();
 
@@ -101,21 +180,80 @@ public class OrderService {
                 orderLine.setQuantity(quantity);
                 orderLine.setOrder(newOrder);
 
-                OrderLine newOrderLine = orderLineRepository.save(orderLine);
+                orderLineRepository.save(orderLine);
 
-                if(isNull(newOrderLine)) {
-                    logger.error("newOrderLine was not saved.");
-                    // TODO: Return an error, order cannot proceed anymore.
-                }
+            }
 
-            });
+            response
+                    .setStatus(SUCCESS)
+                    .setMessage("Successfully created order.")
+                    .setResponse(newOrder);
 
+            return response;
+        } else {
 
-            responseMap.put("order", newOrder);
+            response
+                    .setStatus(ERROR)
+                    .setMessage("Order parameters are not valid.");
 
         }
 
-        return responseMap;
+        return response;
+
+    }
+
+    public DeliveryppResponse<Order> updateStatus(int orderId, String status) {
+
+        DeliveryppResponse<Order> response = new DeliveryppResponse<>();
+
+        boolean isValidStatus = Arrays
+            .stream(OrderStatus.values())
+            .anyMatch(orderStatus ->  orderStatus.name().equals((status)));
+
+        if(!isValidStatus) {
+            response
+                    .setStatus(ERROR)
+                    .setMessage("Status not valid.");
+        }
+
+        Optional<Order> optionalOrder = orderRepository.findById(orderId);
+
+        if(optionalOrder.isPresent()) {
+
+            Order order = optionalOrder.get();
+
+            order.setStatus(status);
+
+            orderRepository.save(order);
+
+            response
+                    .setStatus(SUCCESS)
+                    .setMessage("Order updated")
+                    .setResponse(order);
+
+        } else {
+            response
+                    .setStatus(ERROR)
+                    .setMessage("Order not found")
+                    .setResponse(null);
+        }
+
+        return response;
+
+    }
+
+    public DeliveryppResponse<Order> updateOrder(@Valid Order order) {
+
+        DeliveryppResponse<Order> response = new DeliveryppResponse();
+
+        Order savedOrder = orderRepository.save(order);
+
+        response
+                .setStatus(SUCCESS)
+                .setMessage("Order updated.")
+                .setResponse(savedOrder);
+
+        return response;
 
     }
 
