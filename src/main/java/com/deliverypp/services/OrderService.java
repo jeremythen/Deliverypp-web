@@ -80,8 +80,6 @@ public class OrderService {
 
         DeliveryppResponse<Order> response = new DeliveryppResponse<>();
 
-        Map<String, Object> responseMap = new HashMap<>();
-
         Map<String, Object> paramValidation = validateParams(requestMap);
 
         boolean paramsAreValid = (boolean) paramValidation.get("valid");

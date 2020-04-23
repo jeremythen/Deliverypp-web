@@ -9,7 +9,7 @@ import Main from './components/main/Main';
 
 function App() {
   return (
-    <div className="App border">
+    <div className="App">
       <NavBar />
       <DeliveryppTab />
       <Footer />

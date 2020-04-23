@@ -18,6 +18,7 @@ import javax.validation.Valid;
 
 import static com.deliverypp.util.DeliveryppResponse.*;
 
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/order")
 public class OrderController {

@@ -8,15 +8,15 @@ function ProductTable(props) {
     <Table striped bordered hover>
       <thead>
         <tr>
-          <th>#</th>
-          <th>Title</th>
-          <th>Description</th>
+          <th>Id</th>
+          <th>Categoría</th>
+          <th>Descripción</th>
           <th>Total</th>
         </tr>
       </thead>
       <tbody>
         {props.products.map((product) => {
-          return <tr key={product.id}>
+          return <tr key={product.id} onClick={() => props.onClick(product)}>
                     <td>{product.id}</td>
                     <td>{product.category}</td>
                     <td>{product.description}</td>

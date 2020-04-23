@@ -1,126 +1,106 @@
+import React, { useState, useEffect } from "react";
 
-import React, { useState, useEffect } from 'react';
+import ProductCard from "./ProductCard";
+import ProductTable from "./ProductTable";
 
-import ProductCard from './ProductCard';
-import ProductTable from './ProductTable';
+import "./ProductView.css";
 
-import './ProductView.css';
+import axios from "axios";
 
-import axios from 'axios';
+import Toolbar from '../../common/Toolbar';
 
 function ProductView() {
+  const [cardView, setCardView] = useState(true);
+  const [selectedProductId, setSelectedProductId] = useState(-1);
 
-    const [cardView, setCardView] = useState(true);
+  const [products, setProducts] = useState([]);
 
-    const [products, setProducts] = useState([]);
+  const fetchData = async () => {
+    const response = await axios.get("http://localhost:8080/api/product");
+  
+    const deliveryppResponse = response.data;
 
-    useEffect(() => {
-
-        const fetchData = async () => {
-
-            const response = await axios.get('http://localhost:8080/api/product');
-
-            const deliveryppResponse = response.data;
-
-            if(deliveryppResponse.status === "SUCCESS") {
-                setProducts(deliveryppResponse.response);
-            } else {
-                console.error('Error getting products.');
-            }
-        }
-
-        fetchData();
-
-    }, products);
-
-    const getProductCards = () => {
-        return products.map(product => {
-            return <ProductCard key={product.id} {...product} />
-        });
+    if (deliveryppResponse.status === "SUCCESS") {
+      setProducts(deliveryppResponse.response);
+    } else {
+      console.error("Error getting products.");
     }
+  };
 
-    const getProductTable = () => {
-        return <ProductTable products={products} />
-    }
-    
+  useEffect(() => {
+    fetchData();
+  }, [products.length === 0]);
 
-    return (
-        
-        <div className="ProductView">
-            <div>
-                <button className="btn btn-primary" onClick={() => setCardView(true)}>Card View</button>
-                <button className="btn btn-secondary" onClick={() => setCardView(false)}>Card Table</button>
-            </div>
-            <div >
-                {
-                    cardView ? 
-                            <div className="ProductCardContainer">
-                                { getProductCards() }
-                            </div> 
-                        
-                        : 
-                        
-                        <div className="ProductTableContainer">
-                            {
-                                getProductTable()
-                            }
-                        </div>
-                        
-                }
-            </div>
+  const onProductCardClick = product => {
+    console.log('in onProductCardClick product', product)
+    setSelectedProductId(product.id);
 
+    console.log('in onProductCardClick id: ', product.id)
+  }
+
+  const getProductCards = () => {
+    return products.map((product) => {
+        const selected = product.id == selectedProductId ? 'selected' : '';
+        return <ProductCard key={product.id} {...product} onClick={onProductCardClick} selected={selected} />;
+    });
+  };
+
+  const getProductTable = () => {
+    return <ProductTable products={products} />;
+  };
+
+  const handleProductEdit = () => {
+      console.log('in handleProductEdit for product id: ', selectedProductId)
+  }
+
+  const handleAddProduct = () => {
+    console.log('in handleAddProduct for product id: ', selectedProductId)
+  }
+
+  const handleDeleteProduct = async () => {
+
+    const response = await axios.delete(`http://localhost:8080/api/product/${selectedProductId}`);
+
+    console.log('response', response);
+    console.log('response data', response.data);
+
+    fetchData();
+
+    console.log('in handleDeleteProduct for product id: ', selectedProductId)
+  }
+
+  return (
+    <div className="ProductView">
+      {false && (
+        <div>
+          <button className="btn btn-primary" onClick={() => setCardView(true)}>
+            Card View
+          </button>
+          <button
+            className="btn btn-secondary"
+            onClick={() => setCardView(false)}
+          >
+            Card Table
+          </button>
         </div>
-    );
+      )}
 
+      <Toolbar
+        onEditClick={handleProductEdit}
+        onAddClick={handleAddProduct}
+        onDeleteClick={handleDeleteProduct}
+        disabled={selectedProductId == -1}
+    />
+
+      <div>
+        {cardView ? (
+          <div className="ProductCardContainer">{getProductCards()}</div>
+        ) : (
+          <div className="ProductTableContainer">{getProductTable()}</div>
+        )}
+      </div>
+    </div>
+  );
 }
-
-
-const products = [
-    {
-        id: 1,
-        description: 'Leche evaporada carnation 32 oz',
-        category: 'Leche',
-        price: 50.0,
-        imgSrc: 'https://s3.amazonaws.com/grazecart/saboriza/images/1554136704_5ca23e80bbc99.jpg'
-    },
-    {
-        id: 2,
-        description: 'Description 2',
-        category: 'Category 2',
-        price: 50.0,
-        imgSrc: 'https://s3.amazonaws.com/grazecart/saboriza/images/1554136704_5ca23e80bbc99.jpg'
-    },
-    {
-        id: 3,
-        description: 'Description 3',
-        category: 'Category 3',
-        price: 50.0,
-        imgSrc: 'https://s3.amazonaws.com/grazecart/saboriza/images/1554136704_5ca23e80bbc99.jpg'
-    },
-    {
-        id: 4,
-        description: 'Description 3',
-        category: 'Category 3',
-        price: 50.0,
-        imgSrc: 'https://s3.amazonaws.com/grazecart/saboriza/images/1554136704_5ca23e80bbc99.jpg'
-    },
-    {
-        id: 5,
-        description: 'Description 3',
-        category: 'Category 3',
-        price: 50.0,
-        imgSrc: 'https://s3.amazonaws.com/grazecart/saboriza/images/1554136704_5ca23e80bbc99.jpg'
-    },
-    {
-        id: 6,
-        description: 'Description 3',
-        category: 'Category 3',
-        price: 50.0,
-        imgSrc: 'https://s3.amazonaws.com/grazecart/saboriza/images/1554136704_5ca23e80bbc99.jpg'
-    }
-];
-
-
-
 
 export default ProductView;

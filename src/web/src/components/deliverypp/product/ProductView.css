@@ -1,6 +1,8 @@
 
 .ProductView {
-    
+    padding: 8px;
+    background-color: white;
+    margin-bottom: 80px;
 }
 
 .ProductCardContainer {
@@ -8,8 +10,10 @@
     flex-flow: row wrap;
     justify-content: space-evenly;
     padding: 10px;
+    height: 100%;
 }
 
 .ProductTableContainer {
     padding: 10px;
 }
+
