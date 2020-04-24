@@ -1,4 +1,0 @@
-const DeliveryppService = {
-    env: 'DEV',
-    
-}

@@ -1,28 +1,31 @@
 
 import React from 'react';
 
-import { Card, Button } from 'react-bootstrap';
-
+import {
+    Card, CardImg, CardText, CardBody,
+    CardTitle
+  } from 'reactstrap';
+  
 import './ProductCard.css';
 
 function ProductCard(props) {
     return (
         <div className={`ProductCard m-1 p-2 ${props.selected}`} onClick={() => props.onClick(props)}>
             <Card style={{ width: '18rem' }}>
-                <Card.Img variant="top" src={props.imageUrl} />
-                <Card.Body>
-                    <Card.Title>{props.category}</Card.Title>
-                    <Card.Text>
+                <CardImg top width="100%" src={props.imageUrl} alt={props.description} />
+                <CardBody>
+                    <CardTitle>{props.category}</CardTitle>
+                    <CardText>
                         {
                             props.description
                         }
-                    </Card.Text>
-                    <Card.Text>
+                    </CardText>
+                    <CardText>
                         {
                             `RD$${props.price}`
                         }
-                    </Card.Text>
-                </Card.Body>
+                    </CardText>
+                </CardBody>
             </Card>
         </div>
     )

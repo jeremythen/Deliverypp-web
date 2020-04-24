@@ -14,12 +14,13 @@ function Toolbar(props) {
               </span>
             </div>
             <input
-              type="text"
-              className="form-control"
-              id="validationDefaultUsername"
-              placeholder="Buscar"
-              aria-describedby="inputGroupPrepend2"
-              required
+                onChange={props.onSearch}
+                type="text"
+                className="form-control"
+                id="validationDefaultUsername"
+                placeholder="Buscar"
+                aria-describedby="inputGroupPrepend2"
+                required
             />
           </div>
       </div>
