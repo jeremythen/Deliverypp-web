@@ -6,34 +6,32 @@ import axios from "axios";
 
 import Toolbar from "../../common/Toolbar";
 
+import OrderService from '../../../services/OrderService';
+
 import './OrderView.css';
 
 function OrderView(props) {
   const [orders, setOrders] = useState([]);
+  const [filterableOrders, setFilterableOrders] = useState([]);
 
   const [selectedOrderId, setSelectedOrderId] = useState(-1);
 
+  const getOrders = async () => {
+
+    const orders = await OrderService.getOrders();
+
+    if(Array.isArray(orders) && orders.length > 0) {
+        setOrders(orders);
+        setFilterableOrders(orders);
+    } else {
+        console.error('Error getting orders.');
+    }
+
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      const response = await axios.get("http://localhost:8080/api/order");
-
-      const deliveryppResponse = response.data;
-
-      if (deliveryppResponse.status === "SUCCESS") {
-        setOrders(deliveryppResponse.response);
-      } else {
-        console.error("Error getting products.");
-      }
-    };
-
-    fetchData();
+    getOrders();
   }, [orders.length === 0]);
-
-  const handleEditOrder = () => {};
-
-  const handleAddOrder = () => {};
-
-  const handleDeleteOrder = () => {};
 
   const handleRowClick = order => {
     console.log('handleRowClick order', order)
@@ -42,19 +40,49 @@ function OrderView(props) {
 
   };
 
+  const handleSearch = (event) => {
+
+    const value = event.target.value;
+
+    if(value) {
+
+        const filteredOrders = orders.filter(order => {
+
+            const keys = Object.keys(order);
+
+            for(let key of keys) {
+
+                let propValue = order[key];
+                if(propValue) {
+                    propValue = '' + propValue;
+                    if(propValue.includes(value)) {
+                        return true;
+                    }
+                }
+
+            }
+
+        });
+
+        setFilterableOrders(filteredOrders);
+
+    } else {
+        setFilterableOrders(orders);
+    }
+
+  }
+
   return (
     <div className="OrderView">
       <div>
         <Toolbar
-          onEditClick={handleEditOrder}
-          onAddClick={handleAddOrder}
-          onDeleteClick={handleDeleteOrder}
-          disabled={selectedOrderId == -1}
+        onSearch={handleSearch}
+          noActionButtons={true}
         />
       </div>
       <div className="orderTableContainer mt-1">
         <OrderTable
-            orders={orders}
+            orders={filterableOrders}
             onRowClick={handleRowClick}
         />
       </div>

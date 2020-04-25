@@ -3,6 +3,7 @@ package com.deliverypp.models;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "addresses")
@@ -28,6 +29,12 @@ public class Address {
     @JoinColumn(name = "user_id", nullable = false)
     @JsonBackReference
     private User user;
+
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt = LocalDateTime.now();
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     public int getId() {
         return id;
@@ -75,5 +82,21 @@ public class Address {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }

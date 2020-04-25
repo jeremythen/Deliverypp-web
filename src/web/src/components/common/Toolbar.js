@@ -25,7 +25,17 @@ function Toolbar(props) {
           </div>
       </div>
 
-      <div className="actionButtonsContainer p-1">
+        {
+            props.noActionButtons ? null : <ActionButtons {...props} />
+        }
+      
+    </div>
+  );
+}
+
+function ActionButtons(props) {
+    return (
+        <div className="actionButtonsContainer p-1">
         <button onClick={props.onEditClick} disabled={props.disabled} className="btn btn-secondary mr-1" title="Editar Producto">
           <i className="fa fa-pencil"></i>
         </button>
@@ -38,8 +48,7 @@ function Toolbar(props) {
           <i className="fa fa-trash"></i>
         </button>
       </div>
-    </div>
-  );
+    )
 }
 
 export default Toolbar;

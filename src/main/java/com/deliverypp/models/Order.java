@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Entity
@@ -18,7 +19,7 @@ public class Order {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    @JsonBackReference
+    //@JsonBackReference
     private User user;
 
     @Column(nullable = false)
@@ -37,6 +38,12 @@ public class Order {
 
     @OneToMany(mappedBy = "order")
     private Set<OrderLine> orderLines;
+
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt = LocalDateTime.now();
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     public int getId() {
         return id;
@@ -92,5 +99,21 @@ public class Order {
 
     public void setOrderLines(Set<OrderLine> orderLines) {
         this.orderLines = orderLines;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }

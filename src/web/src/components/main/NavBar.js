@@ -1,20 +1,33 @@
 import React from "react";
 
-import { Navbar, NavDropdown, Nav, Form, Button, FormControl  } from 'react-bootstrap';
+import {
+    Collapse,
+    Navbar,
+    NavbarToggler,
+    NavbarBrand,
+    Nav,
+    NavItem,
+    NavLink,
+  } from 'reactstrap';
+
 
 function NavBar() {
   return (
     <div className="NavBar">
-      <Navbar bg="light" expand="lg">
-        <Navbar.Brand href="#home">Deliverypp</Navbar.Brand>
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
-        <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="mr-auto">
-            <Nav.Link href="#home">Home</Nav.Link>
-            <Nav.Link href="#link">Link</Nav.Link>
-          </Nav>
-        </Navbar.Collapse>
+      <Navbar color="light" light expand="md">
+        <NavbarBrand href="/" color="#940205">
+            <span style={{color: '#940205'}}>Deliverypp</span>
+        </NavbarBrand>
+        <Nav className="mr-auto" navbar>
+        <NavItem>
+            <NavLink href="/about">Acerca de nosotros</NavLink>
+        </NavItem>
+        <NavItem>
+            <NavLink href="products">Productos</NavLink>
+        </NavItem>
+        </Nav>
       </Navbar>
+
     </div>
   );
 }

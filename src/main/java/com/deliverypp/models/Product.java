@@ -2,6 +2,7 @@ package com.deliverypp.models;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "products")
@@ -28,6 +29,12 @@ public class Product {
 
     @Column()
     private boolean visible = true;
+
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt = LocalDateTime.now();
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     public int getId() {
         return id;
@@ -75,5 +82,21 @@ public class Product {
 
     public void setVisible(boolean visible) {
         this.visible = visible;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }

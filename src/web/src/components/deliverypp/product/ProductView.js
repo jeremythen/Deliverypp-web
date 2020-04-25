@@ -124,6 +124,8 @@ function ProductView() {
 
         setFilterableProducts(filteredProducts);
 
+    } else {
+        setFilterableProducts(products);
     }
 
 
