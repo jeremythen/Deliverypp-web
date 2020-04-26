@@ -13,3 +13,10 @@
   display: flex;
 
 }
+
+.alertContainer {
+  position: fixed;
+  right: 10px;
+  top: 80px;
+  z-index: 100000;
+}

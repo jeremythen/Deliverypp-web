@@ -19,6 +19,8 @@ public class DeliveryppResponse<T> {
 
     private String message;
 
+    private DeliveryppResponseStatus specificStatus;
+
     private T response;
 
     public String getStatus() {
@@ -48,12 +50,25 @@ public class DeliveryppResponse<T> {
         return this;
     }
 
+    public DeliveryppResponseStatus getSpecificStatus() {
+        return specificStatus;
+    }
+
+    public DeliveryppResponse<T> setSpecificStatus(DeliveryppResponseStatus specificStatus) {
+        this.specificStatus = specificStatus;
+        return this;
+    }
+
     public static ResponseEntity<DeliveryppResponse<?>> getDefaultResponse(DeliveryppResponse<?> response) {
         if(ERROR.equals(response.getStatus())) {
             return ResponseEntity.badRequest().body(response);
         } else {
             return ResponseEntity.ok(response);
         }
+    }
+
+    public static <T> DeliveryppResponse<T> newResponse() {
+        return new DeliveryppResponse<>();
     }
 
 }

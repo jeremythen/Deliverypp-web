@@ -3,7 +3,6 @@ import React from "react";
 import './Toolbar.css';
 
 function Toolbar(props) {
-    console.log('props', props)
   return (
     <div className="Toolbar p-2 border rounded">
       <div className="searchInputContainer p-1">
@@ -17,7 +16,6 @@ function Toolbar(props) {
                 onChange={props.onSearch}
                 type="text"
                 className="form-control"
-                id="validationDefaultUsername"
                 placeholder="Buscar"
                 aria-describedby="inputGroupPrepend2"
                 required

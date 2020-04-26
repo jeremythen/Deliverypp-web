@@ -30,7 +30,7 @@ public class OrderController {
     private static final Logger logger = LoggerFactory.getLogger(OrderController.class);
 
     @GetMapping()
-    public ResponseEntity<DeliveryppResponse<?>> getOrders() {
+    public ResponseEntity<?> getOrders() {
 
         DeliveryppResponse<List<Order>> response = orderService.getOrders();
 
@@ -39,7 +39,7 @@ public class OrderController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<DeliveryppResponse<?>> getOrderById(@PathVariable int id) {
+    public ResponseEntity<?> getOrderById(@PathVariable int id) {
 
         DeliveryppResponse<Order> response = orderService.getOrderById(id);
 
@@ -48,7 +48,7 @@ public class OrderController {
     }
 
     @PostMapping()
-    public ResponseEntity<DeliveryppResponse<?>> createOrder(@RequestBody Map<String, Object> requestMap) {
+    public ResponseEntity<?> createOrder(@RequestBody Map<String, Object> requestMap) {
 
         DeliveryppResponse<?> response = orderService.createOrder(requestMap);
 
@@ -57,7 +57,7 @@ public class OrderController {
     }
 
     @PutMapping()
-    public ResponseEntity<DeliveryppResponse<?>> updateOrder(@PathVariable int id, @Valid @RequestBody Order order) {
+    public ResponseEntity<?> updateOrder(@PathVariable int id, @Valid @RequestBody Order order) {
 
         DeliveryppResponse<?> response = orderService.updateOrder(order);
 
@@ -66,7 +66,7 @@ public class OrderController {
     }
 
     @PutMapping("/{id}/status/{status}")
-    public ResponseEntity<DeliveryppResponse<?>> setStatus(@PathVariable int id, @PathVariable String status) {
+    public ResponseEntity<?> setStatus(@PathVariable int id, @PathVariable String status) {
 
         DeliveryppResponse<Order> response = orderService.updateStatus(id, status);
 

@@ -35,15 +35,11 @@ const ProductService = {
     },
     getProducts() {
 
-        console.log('in getProducts, ')
-
         const responseData = this.fetch({
             method: 'get',
             path: 'api/product',
             data: {}
         });
-
-        console.log('in getProducts, ', responseData)
 
         return responseData;
 

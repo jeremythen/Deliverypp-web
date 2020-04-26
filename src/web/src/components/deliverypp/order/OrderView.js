@@ -20,7 +20,7 @@ function OrderView(props) {
 
     const orders = await OrderService.getOrders();
 
-    if(Array.isArray(orders) && orders.length > 0) {
+    if(Array.isArray(orders)) {
         setOrders(orders);
         setFilterableOrders(orders);
     } else {
@@ -34,7 +34,6 @@ function OrderView(props) {
   }, [orders.length === 0]);
 
   const handleRowClick = order => {
-    console.log('handleRowClick order', order)
 
     setSelectedOrderId(order.id);
 

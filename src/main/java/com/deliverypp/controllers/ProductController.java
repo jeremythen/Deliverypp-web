@@ -20,8 +20,7 @@ public class ProductController {
     private ProductService productService;
 
     @GetMapping()
-    public ResponseEntity<DeliveryppResponse<?>> getProducts() {
-
+    public ResponseEntity<?> getProducts() {
 
         DeliveryppResponse<?> response = productService.getProducts();
 
@@ -30,7 +29,7 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<DeliveryppResponse<?>> getProductById(@PathVariable int id) {
+    public ResponseEntity<?> getProductById(@PathVariable int id) {
 
         DeliveryppResponse<?> response = productService.getProductById(id);
 
@@ -39,7 +38,7 @@ public class ProductController {
     }
 
     @PostMapping()
-    public ResponseEntity<DeliveryppResponse<?>> addProduct(@RequestBody @Valid Product product) {
+    public ResponseEntity<?> addProduct(@RequestBody @Valid Product product) {
 
         DeliveryppResponse<?> response = productService.addProduct(product);
 
@@ -48,7 +47,7 @@ public class ProductController {
     }
 
     @PutMapping()
-    public ResponseEntity<DeliveryppResponse<?>> updateProduct(@RequestBody @Valid Product product) {
+    public ResponseEntity<?> updateProduct(@RequestBody @Valid Product product) {
 
         DeliveryppResponse<?> response = productService.updateProduct(product);
 
@@ -57,7 +56,7 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity deleteProduct(@PathVariable int id) {
+    public ResponseEntity<?> deleteProduct(@PathVariable int id) {
 
         DeliveryppResponse<?> response = productService.deleteProduct(id);
 

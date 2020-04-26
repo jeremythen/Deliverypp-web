@@ -1,25 +1,28 @@
 package com.deliverypp.controllers;
 
 import com.deliverypp.models.User;
-import com.deliverypp.security.JwtAuthenticationResponse;
 import com.deliverypp.security.JwtTokenProvider;
 import com.deliverypp.services.user.UserService;
+import com.deliverypp.util.DeliveryppResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.HashMap;
 import java.util.Map;
+
+import static com.deliverypp.util.DeliveryppResponse.*;
+import static com.deliverypp.util.DeliveryppResponseStatus.*;
 
 @RestController
 @RequestMapping("/api")
+@CrossOrigin(origins = "http://localhost:3000")
 public class AuthController {
 
     @Autowired
@@ -34,16 +37,16 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody User user) {
 
-        return userService.save(user);
+        DeliveryppResponse<User> response = userService.save(user);
+
+        return ResponseEntity.ok(response);
 
     }
 
-
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, Object> userMap) {
-
-        final String username = (String) userMap.get("username");
-        final String password = (String) userMap.get("password");
+        String username = (String) userMap.get("username");
+        String password = (String) userMap.get("password");
 
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(username, password)
@@ -53,7 +56,41 @@ public class AuthController {
 
         String jwt = tokenProvider.generateToken(authentication);
 
-        return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
+        int userId = tokenProvider.getUserIdFromJWT(jwt);
+
+        DeliveryppResponse<User> userResponse = userService.findUserById(userId);
+
+        Map<String, Object> responseMap = new HashMap<>();
+
+        responseMap.put("token", jwt);
+        responseMap.put("user", userResponse.getResponse());
+
+        DeliveryppResponse<?> response = DeliveryppResponse.newResponse()
+                                .setStatus(DeliveryppResponse.SUCCESS)
+                                .setMessage("User logged in successfully")
+                                .setResponse(responseMap);
+
+        return ResponseEntity.ok(response);
+
+    }
+
+    @GetMapping("/auth/{token}")
+    public ResponseEntity<?> getUserByToken(@PathVariable String token) {
+
+        DeliveryppResponse<User> response;
+
+        if(StringUtils.hasText(token) && tokenProvider.validateToken(token)) {
+            int userId = tokenProvider.getUserIdFromJWT(token);
+            response = userService.findUserById(userId);
+            return ResponseEntity.ok(response);
+        } else {
+            response  = new DeliveryppResponse<>();
+            response
+                    .setStatus(ERROR)
+                    .setMessage("Invalid credentials")
+                    .setSpecificStatus(USER_INVALID_CRED);
+            return ResponseEntity.badRequest().body(response);
+        }
 
     }
 

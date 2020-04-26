@@ -3,14 +3,16 @@ package com.deliverypp.services.user;
 import com.deliverypp.models.User;
 import com.deliverypp.repositories.UserRepository;
 
+import com.deliverypp.util.DeliveryppResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
+
+import static com.deliverypp.util.DeliveryppResponseStatus.*;
+import static com.deliverypp.util.DeliveryppResponse.*;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -27,50 +29,63 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public ResponseEntity save(User user) {
+	public DeliveryppResponse<User> save(User user) {
 
-		Map<String, Object> responseMap = new HashMap<>();
+		DeliveryppResponse<User> response = new DeliveryppResponse<>();
 
 		if(userRepository.existsByEmail(user.getEmail())) {
-			responseMap.put("message", "Email is already taken.");
-			responseMap.put("ERROR_CODE", "EMAIL_TAKEN");
-			return ResponseEntity.badRequest().body(responseMap);
+			response.setStatus(DeliveryppResponse.ERROR)
+					.setSpecificStatus(USER_EMAIL_TAKEN)
+					.setMessage("Email already taken.");
+			return response;
 		}
 
 		if(userRepository.existsByUsername(user.getUsername())) {
-			responseMap.put("message", "Username is already taken.");
-			responseMap.put("ERROR_CODE", "USERNAME_TAKEN");
-			return ResponseEntity.badRequest().body(responseMap);
+			response.setStatus(DeliveryppResponse.ERROR)
+					.setSpecificStatus(USER_NAME_TAKEN)
+					.setMessage("Username already taken.");
+			return response;
 		}
 
 		user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
 		user.setRole("USER");
 		userRepository.save(user);
 
-		responseMap = getFilteredUser(user);
+		response.setStatus(DeliveryppResponse.SUCCESS)
+				.setMessage("User registered successfully.")
+				.setResponse(user);
 
-		return ResponseEntity.ok(responseMap);
-	}
-
-	@Override
-	public Map<String, Object> getFilteredUser(User user) {
-
-		Map<String, Object> userInfo = new HashMap<>();
-
-		userInfo.put("id", user.getId());
-		userInfo.put("name", user.getName());
-		userInfo.put("lastName", user.getLastName());
-		userInfo.put("username", user.getUsername());
-		userInfo.put("email", user.getEmail());
-		userInfo.put("role", user.getRole());
-
-		return userInfo;
-
+		return response;
 	}
 
 	@Override
 	public User findByUsername(String username) {
 		return userRepository.findByUsername(username);
 	}
+
+	@Override
+	public DeliveryppResponse<User> findUserById(int id) {
+
+		Optional<User> optionalUser = userRepository.findById(id);
+
+		DeliveryppResponse<User> response = new DeliveryppResponse<>();
+
+		if(optionalUser.isPresent()) {
+			response
+					.setStatus(SUCCESS)
+					.setMessage("User retrieved successfully")
+					.setResponse(optionalUser.get());
+			return response;
+		} else {
+			response
+					.setStatus(ERROR)
+					.setSpecificStatus(USER_NOT_FOUND)
+					.setMessage("Not a valid user.")
+					.setResponse(optionalUser.get());
+			return response;
+		}
+
+	}
+
 
 }

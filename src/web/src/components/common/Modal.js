@@ -5,7 +5,7 @@ import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 function DModal(props) {
     return (
         <div>
-        <Modal isOpen={props.showModal} className={props.className}>
+        <Modal isOpen={props.showModal}>
             <ModalHeader toggle={props.toggle}>{props.title}</ModalHeader>
             <ModalBody>
                 {

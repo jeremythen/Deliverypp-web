@@ -3,10 +3,6 @@
     cursor: pointer;
 }
 
-.ProductCard .card:hover {
-    border-color: rgb(184, 82, 82);
-}
-
 .ProductCard.selected {
     outline: 1px solid rgb(184, 82, 82);
 }

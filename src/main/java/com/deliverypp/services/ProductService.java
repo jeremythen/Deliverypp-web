@@ -13,6 +13,9 @@ import static java.util.Objects.*;
 
 import static com.deliverypp.util.DeliveryppResponse.*;
 
+import static com.deliverypp.util.DeliveryppResponse.*;
+import static com.deliverypp.util.DeliveryppResponseStatus.*;
+
 @Service
 public class ProductService {
 
@@ -47,6 +50,7 @@ public class ProductService {
 
         } else {
             response.setStatus(ERROR)
+                    .setSpecificStatus(PRODUCT_NOT_AVAILABLE)
                     .setMessage("Product not available.");
         }
 
@@ -61,6 +65,7 @@ public class ProductService {
         if(isNull(product)) {
             response
                     .setStatus(ERROR)
+                    .setSpecificStatus(PRODUCT_EMPTY)
                     .setMessage("No product provided.");
             return response;
         }
@@ -87,6 +92,7 @@ public class ProductService {
                     .setResponse(product);
         } else {
             response.setStatus(ERROR)
+                    .setSpecificStatus(PRODUCT_EMPTY)
                     .setMessage("Product not provided.");
         }
 
@@ -113,6 +119,7 @@ public class ProductService {
 
         } else {
             response.setStatus(ERROR)
+                    .setSpecificStatus(PRODUCT_NOT_AVAILABLE)
                     .setMessage("Product does not exist.");
         }
 

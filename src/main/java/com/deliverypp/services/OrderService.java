@@ -19,6 +19,7 @@ import com.deliverypp.util.DeliveryppResponse;
 import javax.validation.Valid;
 
 import static com.deliverypp.util.DeliveryppResponse.*;
+import static com.deliverypp.util.DeliveryppResponseStatus.*;
 
 @Service
 public class OrderService {
@@ -67,6 +68,7 @@ public class OrderService {
                     .setResponse(optionalOrder.get());
         } else {
             response.setStatus(ERROR)
+                    .setSpecificStatus(ORDER_NOT_FOUND)
                     .setMessage("No order with id: " + id);
         }
 
@@ -104,6 +106,7 @@ public class OrderService {
             } else {
                 response
                         .setStatus(ERROR)
+                        .setSpecificStatus(USER_NOT_FOUND)
                         .setMessage("User not found.");
             }
 
@@ -115,6 +118,7 @@ public class OrderService {
             if(isNull(latitude) || isNull(longitude)) {
                 response
                         .setStatus(ERROR)
+                        .setSpecificStatus(LOCATION_INVALID)
                         .setMessage("Longitude and Latitude required.");
 
                 return response;
@@ -143,6 +147,7 @@ public class OrderService {
 
                 response
                         .setStatus(ERROR)
+                        .setSpecificStatus(ORDER_NOT_SAVED)
                         .setMessage("Error saving order.");
 
                 return response;
@@ -152,6 +157,7 @@ public class OrderService {
             if(orderedProducts.size() == 0) {
                 response
                         .setStatus(ERROR)
+                        .setSpecificStatus(PRODUCT_EMPTY)
                         .setMessage("No products selected.");
             }
 
@@ -168,6 +174,7 @@ public class OrderService {
                 } else {
                     response
                             .setStatus(ERROR)
+                            .setSpecificStatus(PRODUCT_NOT_AVAILABLE)
                             .setMessage("Product not available.");
                     return response;
                 }
@@ -192,6 +199,7 @@ public class OrderService {
 
             response
                     .setStatus(ERROR)
+                    .setSpecificStatus(ORDER_INVALID)
                     .setMessage("Order parameters are not valid.");
 
         }
@@ -204,13 +212,12 @@ public class OrderService {
 
         DeliveryppResponse<Order> response = new DeliveryppResponse<>();
 
-        boolean isValidStatus = Arrays
-            .stream(OrderStatus.values())
-            .anyMatch(orderStatus ->  orderStatus.name().equals((status)));
+        boolean isValidStatus = OrderStatus.isValidStatus(status);
 
         if(!isValidStatus) {
             response
                     .setStatus(ERROR)
+                    .setSpecificStatus(ORDER_STATUS_INVALID)
                     .setMessage("Status not valid.");
         }
 
@@ -232,6 +239,7 @@ public class OrderService {
         } else {
             response
                     .setStatus(ERROR)
+                    .setSpecificStatus(ORDER_NOT_FOUND)
                     .setMessage("Order not found")
                     .setResponse(null);
         }

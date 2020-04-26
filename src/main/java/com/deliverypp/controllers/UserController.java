@@ -1,5 +1,7 @@
 package com.deliverypp.controllers;
 
+import com.deliverypp.util.DeliveryppResponse;
+import com.deliverypp.util.DeliveryppResponseStatus;
 import com.deliverypp.util.Roles;
 import com.deliverypp.models.User;
 import com.deliverypp.security.JwtTokenProvider;
@@ -15,8 +17,13 @@ import javax.validation.Valid;
 import java.util.*;
 import java.util.stream.Stream;
 
+import static com.deliverypp.util.DeliveryppResponse.*;
+import static com.deliverypp.util.DeliveryppResponseStatus.*;
+
+
 @RestController
 @RequestMapping("/api/users")
+@CrossOrigin(origins = "http://localhost:3000")
 public class UserController {
 
 	@Autowired
@@ -28,51 +35,70 @@ public class UserController {
 	private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 	
 	@GetMapping()
-	public Iterable<User> getUsers() {
+	public ResponseEntity<?> getUsers() {
 
 		Iterable<User> users = userService.getUsers();
 
-		return users;
+		DeliveryppResponse<?> response = DeliveryppResponse.<Iterable<User>>newResponse()
+				.setStatus(SUCCESS)
+				.setMessage("Successfully retried users.")
+				.setResponse(users);
+
+		return ResponseEntity.ok(response);
 
 	}
 
 	@PutMapping()
-	public ResponseEntity.HeadersBuilder updateUser(@Valid @RequestBody User user) {
+	public ResponseEntity<?> updateUser(@Valid @RequestBody User user) {
 
 		userService.save(user);
-		return ResponseEntity.noContent();
+
+		DeliveryppResponse<?> response = DeliveryppResponse.newResponse()
+				.setStatus(SUCCESS)
+				.setSpecificStatus(USER_UPDATED)
+				.setMessage("Successfully updated users.");
+
+		return ResponseEntity.ok(response);
 
 	}
 
 	@GetMapping("/{userName}")
-	public ResponseEntity getUserByUserName(@PathVariable String userName) {
+	public ResponseEntity<?> getUserByUserName(@PathVariable String userName) {
 
 		User user = userService.findByUsername(userName);
 
+		DeliveryppResponse<User> response = DeliveryppResponse.newResponse();
+
 		if(Objects.isNull(user)) {
-			Map<String, Object> responseMap = new HashMap<>();
-			responseMap.put("message", "No user with username " + userName + " was found");
-			ResponseEntity.badRequest().body(responseMap);
+			response.setStatus(ERROR)
+					.setMessage("No user with username " + userName + " was found")
+					.setSpecificStatus(USER_NOT_FOUND);
+
+			return ResponseEntity.badRequest().body(response);
 		}
 
-		Map<String, Object> userInfo = userService.getFilteredUser(user);
+		response.setStatus(SUCCESS)
+				.setMessage("Successfully retrieved user.")
+				.setResponse(user);
 
-		return ResponseEntity.ok(userInfo);
+		return ResponseEntity.ok(response);
 
 	}
 
 	@PostMapping("/{userName}/role")
-	public ResponseEntity addUserRole(@PathVariable String userName, @RequestBody Map<String, String> requestMap) {
+	public ResponseEntity<?> addUserRole(@PathVariable String userName, @RequestBody Map<String, String> requestMap) {
 
 		String newRole = requestMap.get("role");
 
 		logger.info("New role: " + newRole);
 
-		boolean isValidRole = Arrays.stream(Roles.values()).anyMatch(role -> role.name().equals(newRole));
+		boolean isValidRole = Roles.isValidRole(newRole);
 
 		logger.info("isValidRole: " + isValidRole);
 
 		logger.info("Roles.values: " + Arrays.toString(Roles.values()));
+
+		DeliveryppResponse<User> response = DeliveryppResponse.newResponse();
 
 		if(!isValidRole) {
 			logger.info("!isValidRole: " + isValidRole);
@@ -81,7 +107,11 @@ public class UserController {
 			responseBody.put("message", "Invalid role.");
 			responseBody.put("rolesAllowed", Roles.values());
 
-			return ResponseEntity.badRequest().body(responseBody);
+			response.setStatus(ERROR)
+					.setMessage("Invalid role")
+					.setSpecificStatus(USER_INVALID_ROLE);
+
+			return ResponseEntity.badRequest().body(response);
 
 		}
 
@@ -91,20 +121,11 @@ public class UserController {
 
 		userService.save(user);
 
-		return ResponseEntity.noContent().build();
+		response.setStatus(SUCCESS)
+				.setMessage("User role updated.")
+				.setResponse(user);
 
-	}
-
-	@DeleteMapping("/{userName}/role/{roleName}")
-	public ResponseEntity.HeadersBuilder removeUserRole(@PathVariable String userName, @PathVariable String roleName) {
-
-		User user = userService.findByUsername(userName);
-
-		user.setRole(Roles.USER.name());
-
-		userService.save(user);
-
-		return ResponseEntity.noContent();
+		return ResponseEntity.ok(response);
 
 	}
 

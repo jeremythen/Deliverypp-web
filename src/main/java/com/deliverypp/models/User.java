@@ -49,7 +49,7 @@ public class User {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 10)
     private String telephone;
 
     public int getId() {
