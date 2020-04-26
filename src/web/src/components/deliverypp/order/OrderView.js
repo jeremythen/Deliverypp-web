@@ -33,7 +33,7 @@ function OrderView({ showAlert }) {
 
   useEffect(() => {
     getOrders();
-  }, [orders.length === 0]);
+  }, []);
 
   const handleRowClick = order => {
 

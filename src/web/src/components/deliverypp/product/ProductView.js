@@ -64,6 +64,37 @@ function ProductView({ showAlert }) {
       console.log('filter', filter)
       filterProducts(newProducts, filter);
       showAlert({ color: 'success', message: 'Producto agregado.'});
+      setShowModal(false);
+    } else {
+      console.log('Error getting products')
+      showAlert({ color: 'warning', message: 'Error agregando producto.'});
+    }
+    
+  };
+  const updateProduct = async () => {
+    
+    const responseData = await ProductService.updateProduct(selectedProduct);
+
+    if(responseData && responseData.status === 'SUCCESS') {
+
+      const newProduct = responseData.response;
+
+      const newProducts = [...products];
+
+      newProducts.forEach(product => {
+        if(product.id === newProduct.id) {
+          product.description = newProduct.description;
+          product.price = newProduct.price;
+          product.category = newProduct.category;
+          product.imageUrl = newProduct.imageUrl;
+          return false;
+        }
+      });
+
+      setProducts(newProducts);
+      filterProducts(newProducts, filter);
+      showAlert({ color: 'success', message: 'Producto agregado.'});
+      setShowModal(false);
     } else {
       console.log('Error getting products')
       showAlert({ color: 'warning', message: 'Error agregando producto.'});
@@ -75,7 +106,7 @@ function ProductView({ showAlert }) {
 
     getProducts();
 
-  }, [products.length === 0]);
+  }, []);
 
   const onProductCardClick = product => {
     setSelectedProduct(product);
@@ -177,9 +208,14 @@ function ProductView({ showAlert }) {
 
   const onSave = () => {
 
-    createProduct();
-
-    setShowModal(false);
+    switch(action) {
+      case 'add':
+        createProduct();
+        break;
+      case 'edit':
+        updateProduct();
+        break;
+    }
 
   }
 

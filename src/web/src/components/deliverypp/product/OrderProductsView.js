@@ -31,7 +31,7 @@ function OrderProductsView({ showAlert }) {
 
     useEffect(() => {
         getProducts();
-    }, [products.length === 0]);
+    }, []);
 
     const onProductCardClick = product => {
         setSelectedProduct(product);

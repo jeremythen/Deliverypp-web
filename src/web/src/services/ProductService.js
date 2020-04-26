@@ -50,7 +50,19 @@ const ProductService = {
         return this.handleResponse(response);
 
     },
-    
+    async updateProduct(product) {
+
+        const token = localStorage.getItem('deliverypp_user_login_token');
+
+        const headers = {
+            Authorization: `Bearer ${token}`
+        };
+
+        const response = await axios.put(`${basePath}/api/product`, product, { headers });
+
+        return this.handleResponse(response);
+
+    },
     async deleteProductById(productId) {
 
         const token = localStorage.getItem('deliverypp_user_login_token');
