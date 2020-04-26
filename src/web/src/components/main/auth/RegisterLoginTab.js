@@ -40,15 +40,15 @@ function RegisterLoginTab(props) {
     if(responseData) {
 
         if(responseData.status === 'ERROR') {
-            props.onAlertShow({ color: 'warning', message: responseData.message});
+            props.showAlert({ color: 'warning', message: responseData.message});
         } else if(responseData.status === 'SUCCESS') {
-            props.onAlertShow({ color: 'info', message: responseData.message});
+            props.showAlert({ color: 'info', message: responseData.message});
         } else {
-            props.onAlertShow({ color: 'warning', message: 'Hubo un error durante el registro. Trata luego.'});
+            props.showAlert({ color: 'warning', message: 'Hubo un error durante el registro. Trata luego.'});
         }
     
     } else {
-        props.onAlertShow({ color: 'warning', message: 'Hubo un error durante el registro. Trata luego.'});
+        props.showAlert({ color: 'warning', message: 'Hubo un error durante el registro. Trata luego.'});
     }
 
   };

@@ -17,7 +17,7 @@ import {
   } from 'reactstrap';
 
 
-function ProductView() {
+function ProductView({ showAlert }) {
   const [cardView, setCardView] = useState(true);
   const [selectedProductId, setSelectedProductId] = useState(-1);
 
@@ -30,26 +30,46 @@ function ProductView() {
 
   const [selectedProduct, setSelectedProduct] = useState({description: '', price: 0, imageUrl: '', category: ''});
 
+  const [filter, setFilter] = useState('');
+
   const getProducts = async () => {
 
-    const products = await ProductService.getProducts();
-
-    if(Array.isArray(products)) {
-        setProducts(products);
+    const responseData = await ProductService.getProducts();
+    console.log('in getProducts responseData', responseData)
+    if(responseData && responseData.status === 'SUCCESS') {
+      const products = responseData.response;
+      setProducts(products);
         setFilterableProducts(products);
+        
     } else {
-        console.error('Error getting products.');
+      console.log('Error getting products')
+      showAlert({ color: 'warning', message: 'Error obteniendo productos.'});
     }
 
   };
 
   const createProduct = async () => {
 
-    const newProduct = await ProductService.addProduct(selectedProduct);
+    const responseData = await ProductService.addProduct(selectedProduct);
 
-    setProducts([newProduct, ...products]);
+    if(responseData && responseData.status === 'SUCCESS') {
 
-  }
+      const newProduct = responseData.response;
+
+      console.log('creatProduct ', newProduct)
+
+      const newProducts = [newProduct, ...products];
+
+      setProducts(newProducts);
+      console.log('filter', filter)
+      filterProducts(newProducts, filter);
+      showAlert({ color: 'success', message: 'Producto agregado.'});
+    } else {
+      console.log('Error getting products')
+      showAlert({ color: 'warning', message: 'Error agregando producto.'});
+    }
+
+  };
 
   useEffect(() => {
 
@@ -73,7 +93,7 @@ function ProductView() {
     return <ProductTable products={filterableProducts} />;
   };
 
-  const handleEditProduct = () => {
+  const showEditProductForm = () => {
 
     setAction('edit');
 
@@ -81,7 +101,7 @@ function ProductView() {
 
   }
 
-  const handleAddProduct = () => {
+  const showAddProductForm = () => {
 
     setAction('add');
     setSelectedProduct({description: '', price: 0, imageUrl: '', category: ''});
@@ -91,43 +111,67 @@ function ProductView() {
 
   const handleDeleteProduct = async () => {
 
-    const response = await ProductService.deleteProductById(selectedProductId);
+    const deleteProductConfirm = window.confirm('Seguro quiere borrar el producto seleccionado?');
+
+    if(deleteProductConfirm) {
+
+      const responseData = await ProductService.deleteProductById(selectedProductId);
+
+      if(responseData && responseData.status === 'SUCCESS') {
+        showAlert({ color: 'success', message: 'Producto eliminado.'});
+        console.log('products before filtering: ', [...products])
+        const filteredProducts = products.filter(product => product.id != selectedProductId);
+        console.log('products after filtering: ', [...filteredProducts])
+        setProducts(filteredProducts);
+
+        console.log('filter', filter)
+        filterProducts(filteredProducts, filter);
+      } else {
+        console.log('Error deleting product.')
+        showAlert({ color: 'warning', message: 'Error eliminando producto.'});
+      }
+    }
 
   };
+
+  const filterProducts = (products, value) => {
+    if(value) {
+
+      const filteredProducts = products.filter(product => {
+
+          const keys = Object.keys(product);
+
+          for(let key of keys) {
+
+              if(key === 'category' || key === 'price' || key === 'description') {
+                  let propValue = product[key];
+                  if(propValue) {
+                      propValue = '' + propValue;
+                      if(propValue.includes(value)) {
+                          return true;
+                      }
+                  }
+              }
+
+              
+          }
+
+      });
+      console.log('in value filteredProducts', [...filteredProducts])
+      setFilterableProducts(filteredProducts);
+
+  } else {
+    console.log('outside value products', [...products])
+      setFilterableProducts(products);
+  }
+  }
 
   const handleSearch = (event) => {
 
     const value = event.target.value;
 
-    if(value) {
-
-        const filteredProducts = products.filter(product => {
-
-            const keys = Object.keys(product);
-
-            for(let key of keys) {
-
-                if(key !== 'imageUrl') {
-                    let propValue = product[key];
-                    if(propValue) {
-                        propValue = '' + propValue;
-                        if(propValue.includes(value)) {
-                            return true;
-                        }
-                    }
-                }
-
-                
-            }
-
-        });
-
-        setFilterableProducts(filteredProducts);
-
-    } else {
-        setFilterableProducts(products);
-    }
-
+    setFilter(value);
+    filterProducts(products, value);
 
   }
 
@@ -190,8 +234,8 @@ function ProductView() {
 
         <Toolbar
             onSearch={handleSearch}
-            onEditClick={handleEditProduct}
-            onAddClick={handleAddProduct}
+            onEditClick={showEditProductForm}
+            onAddClick={showAddProductForm}
             onDeleteClick={handleDeleteProduct}
             disabled={selectedProductId == -1}
         />

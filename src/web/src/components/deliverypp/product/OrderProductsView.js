@@ -6,7 +6,7 @@ import ProductService from '../../../services/ProductService';
 
 import './ProductView.css';
 
-function OrderProductsView() {
+function OrderProductsView({ showAlert }) {
 
     const [products, setProducts ] = useState([]);
     const [filterableProducts, setFilterableProducts ] = useState([]);
@@ -15,14 +15,17 @@ function OrderProductsView() {
 
     const getProducts = async () => {
 
-        const products = await ProductService.getProducts();
+        const responseData = await ProductService.getProducts();
 
-        if(Array.isArray(products)) {
+        if(responseData.status === 'SUCCESS') {
+            const products = responseData.response;
             setProducts(products);
-            setFilterableProducts(products);
-        } else {
-            console.error('Error getting products.');
-        }
+              setFilterableProducts(products);
+              
+          } else {
+            console.log('Error getting products')
+            showAlert({ color: 'warning', message: 'Error obteniendo productos.'});
+          }
 
     };
 

@@ -7,76 +7,63 @@ const basePath = deliverypp.getPath();
 const { SUCCESS, ERROR } = deliverypp.STATUS;
 
 const ProductService = {
-    async fetch({method, path, data}) {
-        try {
-
-            const response = await axios[method](`${basePath}/${path}`, data);
-
-            const responseData = this.handleResponse(response);
-    
-            return responseData;
-
-        } catch(e) {
-            console.error('Error fetching product data: ', e);
-        }
-    },
-    handleResponse(response) {
+    async handleResponse(response) {
         console.info('handleResponse: ', response);
         if(response && response.data) {
             const deliveryppResponse = response.data;
     
-            if(deliveryppResponse.status === SUCCESS) {
-                return deliveryppResponse.response;
-            } else {
-                console.error(deliveryppResponse.message);
-                return null;
-            }
+            return deliveryppResponse;
         }
     },
-    getProducts() {
+    async getProducts() {
 
-        const responseData = this.fetch({
-            method: 'get',
-            path: 'api/product',
-            data: {}
-        });
+        const response = await axios.get(`${basePath}/api/product`);
 
-        return responseData;
+        return this.handleResponse(response);
 
     },
     
-    getProductById(productId) {
+    async getProductById(productId) {
 
-        const responseData = this.fetch({
-            method: 'get',
-            path: `api/product/${productId}`,
-            data: {}
-        });
+        const token = localStorage.getItem('deliverypp_user_login_token');
 
-        return responseData;
+        const headers = {
+            Authorization: `Bearer ${token}`
+        };
+
+        const response = await axios.get(`${basePath}/api/product/${productId}`, { headers });
+
+        return this.handleResponse(response);
     
     },
     
-    addProduct(product) {
+    async addProduct(product) {
 
-        const responseData = this.fetch({
-            method: 'post',
-            path: `api/product`,
-            data: product
-        });
+        const token = localStorage.getItem('deliverypp_user_login_token');
 
-        return responseData;
+        const headers = {
+            Authorization: `Bearer ${token}`
+        };
+
+        const response = await axios.post(`${basePath}/api/product`, product, { headers });
+
+        return this.handleResponse(response);
 
     },
     
-    deleteProductById(productId) {
-        const responseData = this.fetch({
-            method: 'delete',
-            path: `api/product/${productId}`,
-            data: {}
-        });
+    async deleteProductById(productId) {
 
-        return responseData;
+        const token = localStorage.getItem('deliverypp_user_login_token');
+
+        const headers = {
+            Authorization: `Bearer ${token}`
+        };
+
+        const response = await axios.delete(`${basePath}/api/product/${productId}`, { headers });
+
+        return this.handleResponse(response);
+
+
     }
 };
 

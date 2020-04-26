@@ -10,7 +10,7 @@ import OrderService from '../../../services/OrderService';
 
 import './OrderView.css';
 
-function OrderView(props) {
+function OrderView({ showAlert }) {
   const [orders, setOrders] = useState([]);
   const [filterableOrders, setFilterableOrders] = useState([]);
 
@@ -18,13 +18,15 @@ function OrderView(props) {
 
   const getOrders = async () => {
 
-    const orders = await OrderService.getOrders();
+    const responseData = await OrderService.getOrders();
 
-    if(Array.isArray(orders)) {
+    if(responseData && responseData.status === 'SUCCESS') {
+      const orders = responseData.response;
         setOrders(orders);
         setFilterableOrders(orders);
     } else {
-        console.error('Error getting orders.');
+      console.log('Error getting orders.')
+      showAlert({ color: 'warning', message: 'Error getting orders.'});
     }
 
   };

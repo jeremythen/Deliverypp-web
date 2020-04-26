@@ -66,7 +66,7 @@ function App() {
     setShowRegisterLoginTab(!showRegisterLoginTab);
   };
 
-  const onAlertShow = ({ color, message }) => {
+  const showAlert = ({ color, message }) => {
     setAlertColor(color);
     setAlertMessage(message);
     setAlertVisible(true);
@@ -133,10 +133,10 @@ function App() {
         />
         
         {
-          showRegisterLoginTab && <RegisterLoginTab showModal={showRegisterLoginTab} toggle={toggleRegisterLoginTab} color={mainColor} onAlertShow={onAlertShow} onLogin={onLogin} />
+          showRegisterLoginTab && <RegisterLoginTab showModal={showRegisterLoginTab} toggle={toggleRegisterLoginTab} color={mainColor} showAlert={showAlert} onLogin={onLogin} />
         }
 
-        <DeliveryppTab color={mainColor} isUserLoggedIn={isUserLoggedIn} user={user} />
+        <DeliveryppTab showAlert={showAlert} color={mainColor} isUserLoggedIn={isUserLoggedIn} user={user} />
 
         <Footer color={mainColor} />
       </div>

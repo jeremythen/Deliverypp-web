@@ -32,10 +32,10 @@ function DeliveryppTab(props) {
         return (
             <>
                 <TabPane tabId="product">
-                    <ProductView />
+                    <ProductView showAlert={props.showAlert} />
                 </TabPane>
                 <TabPane tabId="orders">
-                    <OrderView />
+                    <OrderView showAlert={props.showAlert} />
                 </TabPane>
             </>
         )
@@ -54,7 +54,7 @@ function DeliveryppTab(props) {
       </Nav>
       <TabContent activeTab={activeTab}>
         <TabPane tabId="available_products">
-          <OrderProductsView />
+          <OrderProductsView showAlert={props.showAlert} />
         </TabPane>
         {
             props.isUserLoggedIn && props.user.role === 'ADMIN' && getAdminTabPanes()

@@ -7,77 +7,58 @@ const basePath = deliverypp.getPath();
 const { SUCCESS, ERROR } = deliverypp.STATUS;
 
 const OrderService = {
-    async fetch({method, path, data}) {
-        try {
-
-            const response = await axios[method](`${basePath}/${path}`, data);
-
-            const responseData = this.handleResponse(response);
-    
-            return responseData;
-
-        } catch(e) {
-            console.error('Error fetching order data: ', e);
-        }
-    },
     handleResponse(response) {
         console.info('handleResponse: ', response);
         if(response && response.data) {
             const deliveryppResponse = response.data;
     
-            if(deliveryppResponse.status === SUCCESS) {
-                return deliveryppResponse.response;
-            } else {
-                console.error(deliveryppResponse.message);
-                return null;
-            }
+            return deliveryppResponse;
         }
     },
-    getOrders() {
+    async getOrders() {
 
-        const responseData = this.fetch({
-            method: 'get',
-            path: 'api/order',
-            data: {}
-        });
+        const token = localStorage.getItem('deliverypp_user_login_token');
 
-        return responseData;
+        const headers = {
+            Authorization: `Bearer ${token}`
+        };
 
-    },
-    
-    getOrderById(orderId) {
+        console.log('headers',headers )
 
-        const responseData = this.fetch({
-            method: 'get',
-            path: `api/order/${orderId}`,
-            data: {}
-        });
+        const response = await axios.get(`${basePath}/api/order`, { headers });
 
-        return responseData;
-    
-    },
-    
-    addOrder(order) {
-
-        const responseData = this.fetch({
-            method: 'post',
-            path: `api/order`,
-            data: order
-        });
-
-        return responseData;
+        return this.handleResponse(response);
 
     },
     
-    deleteOrderById(orderId) {
-        const responseData = this.fetch({
-            method: 'delete',
-            path: `api/order/${orderId}`,
-            data: {}
-        });
+    async getOrderById(orderId) {
 
-        return responseData;
-    }
+        const token = localStorage.getItem('deliverypp_user_login_token');
+
+        const headers = {
+            Authorization: `Bearer ${token}`
+        };
+
+        const response = await axios.get(`${basePath}/api/order/${orderId}`, { headers });
+
+        return this.handleResponse(response);
+    
+    },
+    
+    async addOrder(order) {
+
+        const token = localStorage.getItem('deliverypp_user_login_token');
+
+        const headers = {
+            Authorization: `Bearer ${token}`
+        };
+
+        const response = await axios.post(`${basePath}/api/order`, order, { headers });
+
+        return this.handleResponse(response);
+
+    },
+    
 };
 
 export default OrderService;
