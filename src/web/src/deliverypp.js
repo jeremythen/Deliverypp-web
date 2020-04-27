@@ -10,7 +10,7 @@ const STATUS = {
     ERROR: 'ERROR'
 };
 
-const deliverypp = {
+const Deliverypp = {
     env: ENVIRONMENTS.DEV,
     getPath() {
         switch(this.env) {
@@ -19,9 +19,12 @@ const deliverypp = {
             case ENVIRONMENTS.QA:
             case ENVIRONMENTS.PROD:
                 return '/'
+            default:
+                console.error('Wrong operation.');
+                break;
         }
     },
     STATUS
 };
 
-export default  deliverypp;
+export default  Deliverypp;

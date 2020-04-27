@@ -1,14 +1,11 @@
 import axios from "axios";
 
-import deliverypp from '../deliverypp';
+import Deliverypp from '../Deliverypp';
 
-const basePath = deliverypp.getPath();
-
-const { SUCCESS, ERROR } = deliverypp.STATUS;
+const basePath = Deliverypp.getPath();
 
 const OrderService = {
     handleResponse(response) {
-        console.info('handleResponse: ', response);
         if(response && response.data) {
             const deliveryppResponse = response.data;
     
@@ -22,8 +19,6 @@ const OrderService = {
         const headers = {
             Authorization: `Bearer ${token}`
         };
-
-        console.log('headers',headers )
 
         const response = await axios.get(`${basePath}/api/order`, { headers });
 

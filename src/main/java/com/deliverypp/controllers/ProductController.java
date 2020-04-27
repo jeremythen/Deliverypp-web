@@ -1,8 +1,10 @@
 package com.deliverypp.controllers;
 
 import com.deliverypp.models.Product;
-import com.deliverypp.services.ProductService;
+import com.deliverypp.services.product.ProductServiceImpl;
 import com.deliverypp.util.DeliveryppResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,13 +18,20 @@ import static com.deliverypp.util.DeliveryppResponse.*;
 @CrossOrigin(origins = "http://localhost:3000")
 public class ProductController {
 
-    @Autowired
-    private ProductService productService;
+    private ProductServiceImpl productServiceImpl;
+
+    private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
+
+    public ProductController(@Autowired ProductServiceImpl productServiceImpl) {
+        this.productServiceImpl = productServiceImpl;
+    }
 
     @GetMapping()
     public ResponseEntity<?> getProducts() {
 
-        DeliveryppResponse<?> response = productService.getProducts();
+        logger.info("getProducts");
+
+        DeliveryppResponse<?> response = productServiceImpl.getProducts();
 
         return getDefaultResponse(response);
 
@@ -31,7 +40,9 @@ public class ProductController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getProductById(@PathVariable int id) {
 
-        DeliveryppResponse<?> response = productService.getProductById(id);
+        logger.info("getProductById id {}", id);
+
+        DeliveryppResponse<?> response = productServiceImpl.getProductById(id);
 
         return getDefaultResponse(response);
 
@@ -40,7 +51,9 @@ public class ProductController {
     @PostMapping()
     public ResponseEntity<?> addProduct(@RequestBody @Valid Product product) {
 
-        DeliveryppResponse<?> response = productService.addProduct(product);
+        logger.info("addProduct {}", product);
+
+        DeliveryppResponse<?> response = productServiceImpl.addProduct(product);
 
         return getDefaultResponse(response);
 
@@ -49,7 +62,15 @@ public class ProductController {
     @PutMapping()
     public ResponseEntity<?> updateProduct(@RequestBody @Valid Product product) {
 
-        DeliveryppResponse<?> response = productService.updateProduct(product);
+        DeliveryppResponse<Product> productServiceResponse = productServiceImpl.getProductById(product.getId());
+
+        if(productServiceResponse.isSuccess()) {
+            logger.info("updateProduct old product {}", productServiceResponse.getResponse());
+        }
+
+        DeliveryppResponse<?> response = productServiceImpl.updateProduct(product);
+
+        logger.info("updateProduct new product {}", product);
 
         return getDefaultResponse(response);
 
@@ -58,7 +79,9 @@ public class ProductController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteProduct(@PathVariable int id) {
 
-        DeliveryppResponse<?> response = productService.deleteProduct(id);
+        logger.info("deleteProduct id {}", id);
+
+        DeliveryppResponse<?> response = productServiceImpl.deleteProduct(id);
 
         return getDefaultResponse(response);
 

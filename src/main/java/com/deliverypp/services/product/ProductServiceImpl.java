@@ -1,10 +1,11 @@
-package com.deliverypp.services;
+package com.deliverypp.services.product;
 
 import com.deliverypp.models.Product;
 import com.deliverypp.repositories.ProductRepository;
 import com.deliverypp.util.DeliveryppResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,15 +14,18 @@ import static java.util.Objects.*;
 
 import static com.deliverypp.util.DeliveryppResponse.*;
 
-import static com.deliverypp.util.DeliveryppResponse.*;
 import static com.deliverypp.util.DeliveryppResponseStatus.*;
 
 @Service
-public class ProductService {
+public class ProductServiceImpl implements ProductService {
 
-    @Autowired
     private ProductRepository productRepository;
 
+    public ProductServiceImpl(@Autowired ProductRepository productRepository) {
+        this.productRepository = productRepository;
+    }
+
+    @Transactional
     public DeliveryppResponse<List<Product>> getProducts() {
 
         DeliveryppResponse<List<Product> >response = new DeliveryppResponse<>();
@@ -36,6 +40,7 @@ public class ProductService {
 
     }
 
+    @Transactional
     public DeliveryppResponse<Product> getProductById(int id) {
 
         Optional<Product> optionalProduct = productRepository.findByIdAndVisible(id, true);
@@ -58,6 +63,7 @@ public class ProductService {
 
     }
 
+    @Transactional
     public DeliveryppResponse<Product> addProduct(Product product) {
 
         DeliveryppResponse<Product> response = new DeliveryppResponse<>();
@@ -81,6 +87,7 @@ public class ProductService {
 
     }
 
+    @Transactional
     public DeliveryppResponse<Product> updateProduct(Product product) {
 
         DeliveryppResponse<Product> response = new DeliveryppResponse<>();
@@ -100,6 +107,7 @@ public class ProductService {
 
     }
 
+    @Transactional
     public DeliveryppResponse<?> deleteProduct(int productId) {
 
         DeliveryppResponse<Product> response = new DeliveryppResponse<>();

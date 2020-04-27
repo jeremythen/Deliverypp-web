@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 
-import axios from 'axios';
-
 import {
     Col, Form,
     FormGroup, Label, Input,
-    Button, FormText, FormFeedback 
+    Button, FormFeedback 
 } from 'reactstrap';
 
 import validator from 'validator';

@@ -17,7 +17,7 @@ function OrderProductsView({ showAlert }) {
 
         const responseData = await ProductService.getProducts();
 
-        if(responseData.status === 'SUCCESS') {
+        if(responseData.success) {
             const products = responseData.response;
             setProducts(products);
               setFilterableProducts(products);
@@ -40,7 +40,7 @@ function OrderProductsView({ showAlert }) {
 
     const getProductCards = () => {
         return filterableProducts.map((product) => {
-            const selected = product.id == selectedProductId ? 'selected' : '';
+            const selected = product.id === selectedProductId ? 'selected' : '';
             return <ProductCard key={product.id} {...product} onClick={onProductCardClick} selected={selected} />;
         });
       };

@@ -1,8 +1,10 @@
-package com.deliverypp.services;
+package com.deliverypp.services.order;
 
 import com.deliverypp.controllers.OrderController;
 import com.deliverypp.models.*;
 import com.deliverypp.repositories.*;
+import com.deliverypp.services.product.ProductService;
+import com.deliverypp.services.user.UserService;
 import com.deliverypp.util.OrderStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +17,7 @@ import java.util.*;
 import static java.util.Objects.*;
 
 import com.deliverypp.util.DeliveryppResponse;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.Valid;
 
@@ -22,7 +25,7 @@ import static com.deliverypp.util.DeliveryppResponse.*;
 import static com.deliverypp.util.DeliveryppResponseStatus.*;
 
 @Service
-public class OrderService {
+public class OrderServiceImpl implements OrderService {
 
     private static final Logger logger = LoggerFactory.getLogger(OrderController.class);
 
@@ -30,7 +33,7 @@ public class OrderService {
     private LocationRepository locationRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
 
     @Autowired
     private OrderRepository orderRepository;
@@ -39,8 +42,9 @@ public class OrderService {
     private OrderLineRepository orderLineRepository;
 
     @Autowired
-    private ProductRepository productRepository;
+    private ProductService productService;
 
+    @Transactional
     public DeliveryppResponse<List<Order>> getOrders() {
 
         List<Order> orders = orderRepository.findAll();
@@ -55,6 +59,7 @@ public class OrderService {
         return response;
     }
 
+    @Transactional
     public DeliveryppResponse<Order> getOrderById(int id) {
 
         Optional<Order> optionalOrder = orderRepository.findById(id);
@@ -76,6 +81,7 @@ public class OrderService {
 
     }
 
+    @Transactional
     public DeliveryppResponse<Order> createOrder(Map<String, Object> requestMap) {
 
         logger.info("createOrder: " + requestMap);
@@ -97,12 +103,12 @@ public class OrderService {
 
             List<Map<String, Integer>> orderedProducts = (List<Map<String, Integer>>) requestMap.get("products");
 
-            Optional<User> optionalUser = userRepository.findById(userId);
+            DeliveryppResponse<User> userServiceResponse = userService.findUserById(userId);
 
             User user = null;
 
-            if(optionalUser.isPresent()) {
-                user = optionalUser.get();
+            if(userServiceResponse.isSuccess()) {
+                user = userServiceResponse.getResponse();
             } else {
                 response
                         .setStatus(ERROR)
@@ -112,8 +118,8 @@ public class OrderService {
 
             Location location = new Location();
 
-            Double longitude = (Double) locationMap.get("longitude");
-            Double latitude = (Double) locationMap.get("latitude");
+            Double longitude = locationMap.get("longitude");
+            Double latitude = locationMap.get("latitude");
 
             if(isNull(latitude) || isNull(longitude)) {
                 response
@@ -142,18 +148,6 @@ public class OrderService {
 
             Order newOrder = orderRepository.save(order);
 
-            if(isNull(newOrder)) {
-                logger.error("newOrder was not saved.");
-
-                response
-                        .setStatus(ERROR)
-                        .setSpecificStatus(ORDER_NOT_SAVED)
-                        .setMessage("Error saving order.");
-
-                return response;
-
-            }
-
             if(orderedProducts.size() == 0) {
                 response
                         .setStatus(ERROR)
@@ -165,12 +159,12 @@ public class OrderService {
                 int id = orderedProduct.get("id");
                 int quantity = orderedProduct.get("quantity");
 
-                Optional<Product> optionalProduct = productRepository.findById(id);
+                DeliveryppResponse<Product> productServiceResponse = productService.getProductById(id);
 
                 Product product = null;
 
-                if(optionalProduct.isPresent()) {
-                    product = optionalProduct.get();
+                if(SUCCESS.equals(productServiceResponse.getStatus())) {
+                    product = productServiceResponse.getResponse();
                 } else {
                     response
                             .setStatus(ERROR)
@@ -208,6 +202,7 @@ public class OrderService {
 
     }
 
+    @Transactional
     public DeliveryppResponse<Order> updateStatus(int orderId, String status) {
 
         DeliveryppResponse<Order> response = new DeliveryppResponse<>();
@@ -248,9 +243,10 @@ public class OrderService {
 
     }
 
+    @Transactional
     public DeliveryppResponse<Order> updateOrder(@Valid Order order) {
 
-        DeliveryppResponse<Order> response = new DeliveryppResponse();
+        DeliveryppResponse<Order> response = new DeliveryppResponse<>();
 
         Order savedOrder = orderRepository.save(order);
 

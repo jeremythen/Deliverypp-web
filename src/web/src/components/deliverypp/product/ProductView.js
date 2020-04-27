@@ -35,8 +35,7 @@ function ProductView({ showAlert }) {
   const getProducts = async () => {
 
     const responseData = await ProductService.getProducts();
-    console.log('in getProducts responseData', responseData)
-    if(responseData && responseData.status === 'SUCCESS') {
+    if(responseData && responseData.success) {
       const products = responseData.response;
       setProducts(products);
         setFilterableProducts(products);
@@ -52,16 +51,13 @@ function ProductView({ showAlert }) {
 
     const responseData = await ProductService.addProduct(selectedProduct);
 
-    if(responseData && responseData.status === 'SUCCESS') {
+    if(responseData && responseData.success) {
 
       const newProduct = responseData.response;
-
-      console.log('creatProduct ', newProduct)
 
       const newProducts = [newProduct, ...products];
 
       setProducts(newProducts);
-      console.log('filter', filter)
       filterProducts(newProducts, filter);
       showAlert({ color: 'success', message: 'Producto agregado.'});
       setShowModal(false);
@@ -72,10 +68,10 @@ function ProductView({ showAlert }) {
     
   };
   const updateProduct = async () => {
-    
+
     const responseData = await ProductService.updateProduct(selectedProduct);
 
-    if(responseData && responseData.status === 'SUCCESS') {
+    if(responseData && responseData.success) {
 
       const newProduct = responseData.response;
 
@@ -115,7 +111,7 @@ function ProductView({ showAlert }) {
 
   const getProductCards = () => {
     return filterableProducts.map((product) => {
-        const selected = product.id == selectedProductId ? 'selected' : '';
+        const selected = product.id === selectedProductId ? 'selected' : '';
         return <ProductCard key={product.id} {...product} onClick={onProductCardClick} selected={selected} />;
     });
   };
@@ -148,14 +144,10 @@ function ProductView({ showAlert }) {
 
       const responseData = await ProductService.deleteProductById(selectedProductId);
 
-      if(responseData && responseData.status === 'SUCCESS') {
+      if(responseData && responseData.success) {
         showAlert({ color: 'success', message: 'Producto eliminado.'});
-        console.log('products before filtering: ', [...products])
-        const filteredProducts = products.filter(product => product.id != selectedProductId);
-        console.log('products after filtering: ', [...filteredProducts])
+        const filteredProducts = products.filter(product => product.id !== selectedProductId);
         setProducts(filteredProducts);
-
-        console.log('filter', filter)
         filterProducts(filteredProducts, filter);
       } else {
         console.log('Error deleting product.')
@@ -183,16 +175,15 @@ function ProductView({ showAlert }) {
                       }
                   }
               }
-
               
           }
 
+          return false;
+
       });
-      console.log('in value filteredProducts', [...filteredProducts])
       setFilterableProducts(filteredProducts);
 
   } else {
-    console.log('outside value products', [...products])
       setFilterableProducts(products);
   }
   }
@@ -215,6 +206,9 @@ function ProductView({ showAlert }) {
       case 'edit':
         updateProduct();
         break;
+      default:
+        console.error('Wrong operation.');
+        break;
     }
 
   }
@@ -233,6 +227,9 @@ function ProductView({ showAlert }) {
             return 'Agregar un producto';
         case 'edit':
             return 'Editar un producto';
+        default:
+          console.error('Wrong operation.');
+          break;
       }
   }
 
@@ -273,7 +270,7 @@ function ProductView({ showAlert }) {
             onEditClick={showEditProductForm}
             onAddClick={showAddProductForm}
             onDeleteClick={handleDeleteProduct}
-            disabled={selectedProductId == -1}
+            disabled={selectedProductId === -1}
         />
 
       <div>

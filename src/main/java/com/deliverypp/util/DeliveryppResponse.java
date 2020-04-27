@@ -23,6 +23,8 @@ public class DeliveryppResponse<T> {
 
     private T response;
 
+    private boolean isSuccess;
+
     public String getStatus() {
         return status;
     }
@@ -71,4 +73,11 @@ public class DeliveryppResponse<T> {
         return new DeliveryppResponse<>();
     }
 
+    public boolean isSuccess() {
+        return isSuccess || SUCCESS.equals(status);
+    }
+
+    public void setSuccess(boolean success) {
+        isSuccess = success;
+    }
 }

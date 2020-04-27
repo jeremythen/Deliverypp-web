@@ -11,16 +11,11 @@ import { TabContent, TabPane, Nav, NavItem, NavLink } from "reactstrap";
 import LoginForm from './LoginForm';
 import RegisterForm from './RegisterForm';
 
-import { Alert } from 'reactstrap';
-
 import './RegisterLoginTab.css';
 
 function RegisterLoginTab(props) {
 
   const [activeTab, setActiveTab] = useState('login');
-  const [alertVisible, setAlertVisible] = useState(false);
-  const [alertMessage, setAlertMessage] = useState('Registered');
-  const [alertColor, setAlertColor] = useState('info');
 
   const toggle = (tab) => {
     if (activeTab !== tab) setActiveTab(tab);
@@ -39,9 +34,9 @@ function RegisterLoginTab(props) {
 
     if(responseData) {
 
-        if(responseData.status === 'ERROR') {
+        if(responseData.success) {
             props.showAlert({ color: 'warning', message: responseData.message});
-        } else if(responseData.status === 'SUCCESS') {
+        } else if(responseData.success) {
             props.showAlert({ color: 'info', message: responseData.message});
         } else {
             props.showAlert({ color: 'warning', message: 'Hubo un error durante el registro. Trata luego.'});

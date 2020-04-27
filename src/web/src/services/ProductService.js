@@ -1,14 +1,11 @@
 import axios from "axios";
 
-import deliverypp from '../deliverypp';
+import Deliverypp from '../Deliverypp';
 
-const basePath = deliverypp.getPath();
-
-const { SUCCESS, ERROR } = deliverypp.STATUS;
+const basePath = Deliverypp.getPath();
 
 const ProductService = {
     async handleResponse(response) {
-        console.info('handleResponse: ', response);
         if(response && response.data) {
             const deliveryppResponse = response.data;
     

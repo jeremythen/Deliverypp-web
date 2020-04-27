@@ -13,10 +13,6 @@ import MainLoader from './components/common/MainLoader';
 
 import AuthService from './services/AuthService';
 
-import axios from 'axios';
-
-import OrderProductsView from './components/deliverypp/product/OrderProductsView';
-
 const mainColor = '#940205';
 
 function App() {
@@ -39,7 +35,7 @@ function App() {
 
         if(responseData && responseData.response) {
           const user = responseData.response;
-          if(responseData.status === 'SUCCESS') {
+          if(responseData.success) {
             setUser(user);
             setIsUserLoggedIn(true);
           }

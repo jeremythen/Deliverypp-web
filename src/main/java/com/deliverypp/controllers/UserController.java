@@ -1,7 +1,6 @@
 package com.deliverypp.controllers;
 
 import com.deliverypp.util.DeliveryppResponse;
-import com.deliverypp.util.DeliveryppResponseStatus;
 import com.deliverypp.util.Roles;
 import com.deliverypp.models.User;
 import com.deliverypp.security.JwtTokenProvider;
@@ -15,11 +14,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.*;
-import java.util.stream.Stream;
 
 import static com.deliverypp.util.DeliveryppResponse.*;
 import static com.deliverypp.util.DeliveryppResponseStatus.*;
-
 
 @RestController
 @RequestMapping("/api/users")

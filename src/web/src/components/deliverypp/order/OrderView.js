@@ -2,8 +2,6 @@ import React, { useState, useEffect } from "react";
 
 import OrderTable from "./OrderTable";
 
-import axios from "axios";
-
 import Toolbar from "../../common/Toolbar";
 
 import OrderService from '../../../services/OrderService';
@@ -20,7 +18,7 @@ function OrderView({ showAlert }) {
 
     const responseData = await OrderService.getOrders();
 
-    if(responseData && responseData.status === 'SUCCESS') {
+    if(responseData && responseData.success) {
       const orders = responseData.response;
         setOrders(orders);
         setFilterableOrders(orders);
