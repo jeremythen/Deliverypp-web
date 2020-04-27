@@ -15,10 +15,10 @@ const Deliverypp = {
     getPath() {
         switch(this.env) {
             case ENVIRONMENTS.DEV:
-                return 'http://localhost:8080';
+                return '';
             case ENVIRONMENTS.QA:
             case ENVIRONMENTS.PROD:
-                return '/'
+                return ''
             default:
                 console.error('Wrong operation.');
                 break;

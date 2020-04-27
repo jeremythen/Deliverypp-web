@@ -41,7 +41,7 @@ const AuthService = {
     
         } catch(e) {
 
-            return this.generateErrorResponse(e.message);
+            return this.generateErrorResponse(e);
 
         }
 
@@ -78,7 +78,7 @@ const AuthService = {
     
         } catch(e) {
 
-            return this.generateErrorResponse(e.message);
+            return this.generateErrorResponse(e);
             
         }
 
@@ -99,7 +99,7 @@ const AuthService = {
     
         } catch(e) {
 
-            return this.generateErrorResponse(e.message);
+            return this.generateErrorResponse(e);
             
         }
 
