@@ -173,13 +173,13 @@ function RegisterForm({onRegister = () => {}}) {
             }
             <Col>
                 <FormGroup>
-                    <Label for="username">Usuario</Label>
+                    <Label for="register_username">Usuario</Label>
                     <Input
                         valid={dirty.username && isValidUsername}
                         invalid={dirty.username && !isValidUsername}
                         type="text"
-                        name="username"
-                        id="username"
+                        name="register_username"
+                        id="register_username"
                         required
                         value={username}
                         onChange={onUsernameInputChange}

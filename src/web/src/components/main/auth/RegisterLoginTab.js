@@ -30,43 +30,35 @@ function RegisterLoginTab(props) {
     registerIconColor = props.color;
   }
 
-  const handleRegisterLoginResponse = (responseData) => {
+  const onRegister = (responseData) => {
 
-    if(responseData) {
-
-        if(responseData.success) {
-            props.showAlert({ color: 'warning', message: responseData.message});
-        } else if(responseData.success) {
-            props.showAlert({ color: 'info', message: responseData.message});
-        } else {
-            props.showAlert({ color: 'warning', message: 'Hubo un error durante el registro. Trata luego.'});
-        }
-    
+    if(!responseData) {
+      props.showAlert({ color: 'warning', message: 'Hubo un error durante el registro. Trate luego.'});
+    } else if(responseData && !responseData.success) {
+      props.showAlert({ color: 'warning', message: responseData.message});
+    } if(responseData && responseData.success) {
+      setActiveTab('login');
     } else {
-        props.showAlert({ color: 'warning', message: 'Hubo un error durante el registro. Trata luego.'});
+      props.showAlert({ color: 'warning', message: 'Hubo un error durante el registro. Trate luego.'});
     }
-
-  };
-
-  const onRegister = (response) => {
-
-    handleRegisterLoginResponse(response);
-
-    setActiveTab('login');
 
   }
 
   const onLogin = (responseData) => {
 
-    handleRegisterLoginResponse(responseData);
-
-    if(responseData && responseData.response) {
+    if(!responseData) {
+      props.showAlert({ color: 'warning', message: 'Hubo un error durante el ingreso. Trate luego.'});
+    } else if(responseData && !responseData.success) {
+      props.showAlert({ color: 'warning', message: responseData.message});
+    } if(responseData && responseData.success && responseData.response) {
         const response = responseData.response;
         if(response.token) {
             localStorage.setItem('deliverypp_user_login_token',  response.token);
             props.toggle();
             props.onLogin(response.user);
         }
+    } else {
+      props.showAlert({ color: 'warning', message: 'Hubo un error durante el ingreso. Trate luego.'});
     }
 
   }

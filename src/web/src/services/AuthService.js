@@ -5,6 +5,22 @@ import Deliverypp from '../Deliverypp';
 const basePath = Deliverypp.getPath();
 
 const AuthService = {
+    generateErrorResponse(error) {
+
+        let message = error.message;
+
+        if(message.includes('401')) {
+            message = "Credenciales incorrectas. Verifique que su usuario y contraseña son correctos."
+        }
+
+        const responseData = {
+            success: false,
+            status: 'ERROR',
+            message: message
+        };
+
+        return responseData;
+    },
     handleResponse(response) {
         if(response && response.data) {
 
@@ -16,45 +32,76 @@ const AuthService = {
     },
     async register(user) {
 
-        const response = await axios.post(`${basePath}/api/register`, user);
+        try {
+            const response = await axios.post(`${basePath}/api/register`, user);
 
-        const responseData = this.handleResponse(response);
+            const responseData = this.handleResponse(response);
+    
+            return responseData;
+    
+        } catch(e) {
 
-        return responseData;
+            return this.generateErrorResponse(e.message);
+
+        }
 
     },
     async login(user) {
 
-        const response = await axios.post(`${basePath}/api/login`, user);
+        try {
+            const response = await axios.post(`${basePath}/api/login`, user);
 
-        const responseData = this.handleResponse(response);
+            const responseData = this.handleResponse(response);
 
-        return responseData;
+            return responseData;
+    
+        } catch(e) {
+            
+            return this.generateErrorResponse(e);
+
+        }
+        
     },
     async getUserByToken(token) {
 
-        const headers = {
-            Authorization: `Bearer ${token}`
-        };
+        try {
 
-        const response = await axios.get(`${basePath}/api/auth/${token}`, headers);
+            const headers = {
+                Authorization: `Bearer ${token}`
+            };
+    
+            const response = await axios.get(`${basePath}/api/auth/${token}`, headers);
+    
+            const responseData = this.handleResponse(response);
+    
+            return responseData;
+    
+        } catch(e) {
 
-        const responseData = this.handleResponse(response);
-
-        return responseData;
+            return this.generateErrorResponse(e.message);
+            
+        }
 
     },
     async logout(token) {
 
-        const headers = {
-            Authorization: `Bearer ${token}`
-        };
+        try {
 
-        const response = await axios.get(`${basePath}/api/auth/${token}`, headers);
+            const headers = {
+                Authorization: `Bearer ${token}`
+            };
+    
+            const response = await axios.get(`${basePath}/api/auth/${token}`, headers);
+    
+            const responseData = this.handleResponse(response);
+    
+            return responseData;
+    
+        } catch(e) {
 
-        const responseData = this.handleResponse(response);
-
-        return responseData;
+            return this.generateErrorResponse(e.message);
+            
+        }
 
     }
     
