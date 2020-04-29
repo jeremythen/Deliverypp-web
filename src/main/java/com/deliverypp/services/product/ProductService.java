@@ -17,4 +17,6 @@ public interface ProductService {
 
     DeliveryppResponse<?> deleteProduct(int productId);
 
+    boolean existsById(int id);
+
 }

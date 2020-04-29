@@ -12,7 +12,7 @@ public interface OrderService {
 
     DeliveryppResponse<Order> getOrderById(int id);
 
-    DeliveryppResponse<Order> createOrder(Map<String, Object> requestMap);
+    DeliveryppResponse<?> createOrder(Map<String, Object> requestMap);
 
     DeliveryppResponse<Order> updateStatus(int orderId, String status);
 

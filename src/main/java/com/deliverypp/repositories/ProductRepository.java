@@ -14,4 +14,6 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 
     Optional<Product> findByIdAndVisible(int id, boolean visible);
 
+    boolean existsByIdAndVisible(int id, boolean visible);
+
 }

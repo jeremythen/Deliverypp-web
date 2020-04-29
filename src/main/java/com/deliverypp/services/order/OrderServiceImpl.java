@@ -82,7 +82,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Transactional
-    public DeliveryppResponse<Order> createOrder(Map<String, Object> requestMap) {
+    public DeliveryppResponse<?> createOrder(Map<String, Object> requestMap) {
 
         logger.info("createOrder: " + requestMap);
 
@@ -118,17 +118,8 @@ public class OrderServiceImpl implements OrderService {
 
             Location location = new Location();
 
-            Double longitude = locationMap.get("longitude");
-            Double latitude = locationMap.get("latitude");
-
-            if(isNull(latitude) || isNull(longitude)) {
-                response
-                        .setStatus(ERROR)
-                        .setSpecificStatus(LOCATION_INVALID)
-                        .setMessage("Longitude and Latitude required.");
-
-                return response;
-            }
+            double longitude = locationMap.get("longitude");
+            double latitude = locationMap.get("latitude");
 
             location.setLatitude(latitude);
 
@@ -148,13 +139,6 @@ public class OrderServiceImpl implements OrderService {
 
             Order newOrder = orderRepository.save(order);
 
-            if(orderedProducts.size() == 0) {
-                response
-                        .setStatus(ERROR)
-                        .setSpecificStatus(PRODUCT_EMPTY)
-                        .setMessage("No products selected.");
-            }
-
             for(Map<String, Integer> orderedProduct : orderedProducts) {
                 int id = orderedProduct.get("id");
                 int quantity = orderedProduct.get("quantity");
@@ -163,13 +147,13 @@ public class OrderServiceImpl implements OrderService {
 
                 Product product = null;
 
-                if(SUCCESS.equals(productServiceResponse.getStatus())) {
+                if(productServiceResponse.isSuccess()) {
                     product = productServiceResponse.getResponse();
                 } else {
                     response
                             .setStatus(ERROR)
                             .setSpecificStatus(PRODUCT_NOT_AVAILABLE)
-                            .setMessage("Product not available.");
+                            .setMessage("Product with id " + id + " not available.");
                     return response;
                 }
 
@@ -191,14 +175,21 @@ public class OrderServiceImpl implements OrderService {
             return response;
         } else {
 
-            response
+            DeliveryppResponse<List<Map<String, String>>> validationResponse = new DeliveryppResponse<>();
+
+            List<Map<String, String>> validationList = (List<Map<String, String>>) paramValidation.get("validationList");
+
+            logger.info("validationList: {}", validationList);
+            logger.error("validationList: {}", validationList);
+
+            validationResponse
                     .setStatus(ERROR)
                     .setSpecificStatus(ORDER_INVALID)
-                    .setMessage("Order parameters are not valid.");
+                    .setMessage("Order parameters are not valid.")
+                    .setResponse(validationList);
 
+            return validationResponse;
         }
-
-        return response;
 
     }
 
@@ -261,11 +252,167 @@ public class OrderServiceImpl implements OrderService {
 
     private Map<String, Object> validateParams(Map<String, Object> requestMap) {
 
-        // TODO: Check if all the parameters are valid.
-
         Map<String, Object> responseMap = new HashMap<>();
 
-        responseMap.put("valid", true);
+        List<Map<String, String>> validationList = new ArrayList<>();
+
+        boolean valid = true;
+
+        if(nonNull(requestMap)) {
+
+            Object userIdObj = requestMap.get("userId");
+            Object totalObj = requestMap.get("total");
+            Object locationObj = requestMap.get("location");
+
+            if(!(userIdObj instanceof Integer)) {
+                Map<String, String> validateMap = new HashMap<>();
+                valid = false;
+                validationList.add(validateMap);
+                validateMap.put("message", "userId not provided.");
+                validateMap.put("code", "USER_INVALID_USER_ID");
+            } else {
+                int userId = (int) userIdObj;
+
+                if(userId < 0) {
+                    Map<String, String> validateMap = new HashMap<>();
+                    valid = false;
+                    validationList.add(validateMap);
+                    validateMap.put("message", "Invalid userId");
+                    validateMap.put("code", "USER_INVALID_USER_ID");
+                }
+            }
+
+            if(!(totalObj instanceof Integer)) {
+                Map<String, String> validateMap = new HashMap<>();
+                valid = false;
+                validationList.add(validateMap);
+                validateMap.put("message", "total not provided.");
+                validateMap.put("code", "ORDER_TOTAL_NOT_PROVIDED");
+            } else {
+                int total = (int) totalObj;
+
+                if(total <= 0) {
+                    Map<String, String> validateMap = new HashMap<>();
+                    valid = false;
+                    validationList.add(validateMap);
+                    validateMap.put("message", "Total cannot be 0 or negative.");
+                    validateMap.put("code", "ORDER_TOTAL_INVALID");
+                }
+            }
+
+            if(!(locationObj instanceof Map)) {
+                Map<String, String> validateMap = new HashMap<>();
+                valid = false;
+                validationList.add(validateMap);
+                validateMap.put("message", "Locations not provided.");
+                validateMap.put("code", "ORDER_LOCATION_NOT_PROVIDED");
+            } else {
+                Map<?, ?> locationMap = (Map<?, ?>) locationObj;
+
+                Object longitudeObj = locationMap.get("longitude");
+                Object latitudeObj = locationMap.get("latitude");
+
+                if(!(longitudeObj instanceof Double)) {
+                    Map<String, String> validateMap = new HashMap<>();
+                    valid = false;
+                    validationList.add(validateMap);
+                    validateMap.put("message", "Location longitude required.");
+                    validateMap.put("code", "ORDER_LOCATION_LONGITUDE_INVALID");
+                }
+
+                if(!(latitudeObj instanceof Double)) {
+                    Map<String, String> validateMap = new HashMap<>();
+                    valid = false;
+                    validationList.add(validateMap);
+                    validateMap.put("message", "Location latitude required.");
+                    validateMap.put("code", "ORDER_LOCATION_LATITUDE_INVALID");
+                }
+            }
+
+            if(requestMap.containsKey("comment") && !(requestMap.get("comment") instanceof String)) {
+                Map<String, String> validateMap = new HashMap<>();
+                valid = false;
+                validationList.add(validateMap);
+                validateMap.put("message", "Comment needs to be a string.");
+                validateMap.put("code", "ORDER_COMMENT_INVALID");
+            }
+
+            Object orderedProductsObj = requestMap.get("products");
+
+            if(!(orderedProductsObj instanceof List) || ((List<?>) orderedProductsObj).isEmpty()) {
+                Map<String, String> validateMap = new HashMap<>();
+                valid = false;
+                validationList.add(validateMap);
+                validateMap.put("message", "Products not provided.");
+                validateMap.put("code", "ORDER_PRODUCTS_NOT_PROVIDED");
+            } else {
+                List<?> products = (List<?>) orderedProductsObj;
+
+                for(Object productMapObj : products) {
+
+                    if(!(productMapObj instanceof Map)) {
+                        Map<String, String> validateMap = new HashMap<>();
+                        valid = false;
+                        validationList.add(validateMap);
+                        validateMap.put("message", "Invalid product.");
+                        validateMap.put("code", "ORDER_PRODUCT_INVALID");
+                    }
+
+                    Map<?, ?> productMap = (Map<?, ?>) productMapObj;
+
+                    if(!(productMap.get("id") instanceof  Integer)) {
+                        Map<String, String> validateMap = new HashMap<>();
+                        valid = false;
+                        validationList.add(validateMap);
+                        validateMap.put("message", "Product id invalid.");
+                        validateMap.put("code", "ORDER_PRODUCT_ID_INVALID");
+                    } else {
+                        int id = (Integer) productMap.get("id");
+
+                        boolean productIsAvailable= productService.existsById(id);
+
+                        if(!productIsAvailable) {
+                            Map<String, String> validateMap = new HashMap<>();
+                            valid = false;
+                            validationList.add(validateMap);
+                            validateMap.put("message", "Product with id " + id + " not available.");
+                            validateMap.put("code", "ORDER_PRODUCT_ID_NOT_AVAILABLE");
+                        }
+                    }
+
+                    if(!(productMap.get("quantity") instanceof  Integer)) {
+                        Map<String, String> validateMap = new HashMap<>();
+                        valid = false;
+                        validationList.add(validateMap);
+                        validateMap.put("message", "Product quantity invalid.");
+                        validateMap.put("code", "ORDER_PRODUCT_QUANTITY_INVALID");
+                    }
+
+                    int quantity = (Integer) productMap.get("quantity");
+
+                    if(quantity <= 0) {
+                        Map<String, String> validateMap = new HashMap<>();
+                        valid = false;
+                        validationList.add(validateMap);
+                        validateMap.put("message", "Product quantity cannot be 0 or negative.");
+                        validateMap.put("code", "ORDER_PRODUCT_QUANTITY_0_NEGATIVE");
+                    }
+
+                }
+
+                if(products.isEmpty()) {
+                    Map<String, String> validateMap = new HashMap<>();
+                    valid = false;
+                    validationList.add(validateMap);
+                    validateMap.put("message", "Products not provided.");
+                    validateMap.put("code", "ORDER_PRODUCTS_NOT_PROVIDED");
+                }
+            }
+
+        }
+
+        responseMap.put("valid", valid);
+        responseMap.put("validationList", validationList);
 
         return responseMap;
 

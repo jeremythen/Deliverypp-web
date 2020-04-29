@@ -135,4 +135,9 @@ public class ProductServiceImpl implements ProductService {
 
     }
 
+    @Override
+    public boolean existsById(int id) {
+        return productRepository.existsByIdAndVisible(id, true);
+    }
+
 }
