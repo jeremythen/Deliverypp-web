@@ -14,7 +14,7 @@ const ProductService = {
     },
     async getProducts() {
 
-        const response = await axios.get(`${basePath}/api/product`);
+        const response = await axios.get(`${basePath}/api/products`);
 
         return this.handleResponse(response);
 
@@ -28,7 +28,7 @@ const ProductService = {
             Authorization: `Bearer ${token}`
         };
 
-        const response = await axios.get(`${basePath}/api/product/${productId}`, { headers });
+        const response = await axios.get(`${basePath}/api/products/${productId}`, { headers });
 
         return this.handleResponse(response);
     
@@ -42,7 +42,7 @@ const ProductService = {
             Authorization: `Bearer ${token}`
         };
 
-        const response = await axios.post(`${basePath}/api/product`, product, { headers });
+        const response = await axios.post(`${basePath}/api/products`, product, { headers });
 
         return this.handleResponse(response);
 
@@ -55,7 +55,7 @@ const ProductService = {
             Authorization: `Bearer ${token}`
         };
 
-        const response = await axios.put(`${basePath}/api/product`, product, { headers });
+        const response = await axios.put(`${basePath}/api/products`, product, { headers });
 
         return this.handleResponse(response);
 
@@ -68,7 +68,7 @@ const ProductService = {
             Authorization: `Bearer ${token}`
         };
 
-        const response = await axios.delete(`${basePath}/api/product/${productId}`, { headers });
+        const response = await axios.delete(`${basePath}/api/products/${productId}`, { headers });
 
         return this.handleResponse(response);
 

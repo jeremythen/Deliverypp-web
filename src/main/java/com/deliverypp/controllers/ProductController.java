@@ -14,7 +14,7 @@ import javax.validation.Valid;
 import static com.deliverypp.util.DeliveryppResponse.*;
 
 @RestController
-@RequestMapping("/api/product")
+@RequestMapping("/api/products")
 @CrossOrigin(origins = "http://localhost:3000")
 public class ProductController {
 

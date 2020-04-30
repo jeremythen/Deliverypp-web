@@ -30,7 +30,7 @@ const OrderService = {
                 Authorization: `Bearer ${token}`
             };
 
-            const response = await axios.get(`${basePath}/api/order`, { headers });
+            const response = await axios.get(`${basePath}/api/orders`, { headers });
 
             return this.handleResponse(response);
     
@@ -52,7 +52,7 @@ const OrderService = {
                 Authorization: `Bearer ${token}`
             };
     
-            const response = await axios.get(`${basePath}/api/order/${orderId}`, { headers });
+            const response = await axios.get(`${basePath}/api/orders/${orderId}`, { headers });
     
             return this.handleResponse(response);
     
@@ -74,7 +74,7 @@ const OrderService = {
                 Authorization: `Bearer ${token}`
             };
     
-            const response = await axios.post(`${basePath}/api/order`, order, { headers });
+            const response = await axios.post(`${basePath}/api/orders`, order, { headers });
     
             return this.handleResponse(response);
     
