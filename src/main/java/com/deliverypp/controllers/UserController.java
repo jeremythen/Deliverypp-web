@@ -34,6 +34,8 @@ public class UserController {
 	@GetMapping()
 	public ResponseEntity<?> getUsers() {
 
+		logger.info("getUsers");
+
 		Iterable<User> users = userService.getUsers();
 
 		DeliveryppResponse<?> response = DeliveryppResponse.<Iterable<User>>newResponse()
@@ -48,6 +50,8 @@ public class UserController {
 	@PutMapping()
 	public ResponseEntity<?> updateUser(@Valid @RequestBody User user) {
 
+		logger.info("updateUser user: {}", user);
+
 		userService.save(user);
 
 		DeliveryppResponse<?> response = DeliveryppResponse.newResponse()
@@ -61,6 +65,8 @@ public class UserController {
 
 	@GetMapping("/{userName}")
 	public ResponseEntity<?> getUserByUserName(@PathVariable String userName) {
+
+		logger.info("getUserByUserName user: {}", userName);
 
 		User user = userService.findByUsername(userName);
 
@@ -84,6 +90,8 @@ public class UserController {
 
 	@PostMapping("/{userName}/role")
 	public ResponseEntity<?> addUserRole(@PathVariable String userName, @RequestBody Map<String, String> requestMap) {
+
+		logger.info("addUserRole userName: {}, requestMap: {}: ", userName, requestMap);
 
 		String newRole = requestMap.get("role");
 

@@ -4,6 +4,8 @@ import com.deliverypp.models.User;
 import com.deliverypp.security.JwtTokenProvider;
 import com.deliverypp.services.user.UserService;
 import com.deliverypp.util.DeliveryppResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,9 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
-
-import static java.util.Objects.*;
 
 import static com.deliverypp.util.DeliveryppResponse.*;
 import static com.deliverypp.util.DeliveryppResponseStatus.*;
@@ -37,8 +36,12 @@ public class AuthController {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
+
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody User user) {
+
+        logger.info("register user {}", user);
 
         DeliveryppResponse<User> response = userService.save(user);
 
@@ -48,6 +51,9 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, Object> userMap) {
+
+        logger.info("login username: {}", userMap.get("username"));
+
         String username = (String) userMap.get("username");
         String password = (String) userMap.get("password");
 
@@ -79,6 +85,8 @@ public class AuthController {
 
     @GetMapping("/auth/{token}")
     public ResponseEntity<?> getUserByToken(@PathVariable String token) {
+
+        logger.info("getUserByToken");
 
         DeliveryppResponse<User> response;
 

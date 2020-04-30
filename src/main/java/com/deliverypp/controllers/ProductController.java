@@ -3,6 +3,8 @@ package com.deliverypp.controllers;
 import com.deliverypp.models.Product;
 import com.deliverypp.services.product.ProductServiceImpl;
 import com.deliverypp.util.DeliveryppResponse;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.LoggerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+
+import java.io.File;
 
 import static com.deliverypp.util.DeliveryppResponse.*;
 
@@ -40,7 +44,7 @@ public class ProductController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getProductById(@PathVariable int id) {
 
-        logger.info("getProductById id {}", id);
+        logger.info("getProductById id: {}", id);
 
         DeliveryppResponse<?> response = productServiceImpl.getProductById(id);
 
@@ -51,7 +55,7 @@ public class ProductController {
     @PostMapping()
     public ResponseEntity<?> addProduct(@RequestBody @Valid Product product) {
 
-        logger.info("addProduct {}", product);
+        logger.info("addProduct: {}", product);
 
         DeliveryppResponse<?> response = productServiceImpl.addProduct(product);
 
@@ -70,7 +74,7 @@ public class ProductController {
 
         DeliveryppResponse<?> response = productServiceImpl.updateProduct(product);
 
-        logger.info("updateProduct new product {}", product);
+        logger.info("updateProduct new product: {}", product);
 
         return getDefaultResponse(response);
 
@@ -79,7 +83,7 @@ public class ProductController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteProduct(@PathVariable int id) {
 
-        logger.info("deleteProduct id {}", id);
+        logger.info("deleteProduct id: {}", id);
 
         DeliveryppResponse<?> response = productServiceImpl.deleteProduct(id);
 
