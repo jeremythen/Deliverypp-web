@@ -1,7 +1,6 @@
 package com.deliverypp.models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -22,7 +21,7 @@ public class OrderLine {
 
     @ManyToOne
     @JoinColumn(name = "product_id")
-    @JsonBackReference
+    //@JsonBackReference
     private Product product;
 
     @Column(nullable = false)

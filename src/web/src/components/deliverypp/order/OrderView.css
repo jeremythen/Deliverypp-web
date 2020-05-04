@@ -1,3 +1,20 @@
 .OrderView {
     padding: 8px;
 }
+
+.order-row:hover {
+    cursor: pointer;
+}
+
+.OrderTable {
+    margin-bottom: 80px;
+}
+
+.imageIconContainer:hover {
+    background-color: rgb(236, 236, 236);
+    cursor: pointer;
+}
+
+.cardImgElem:hover {
+    cursor: pointer;
+}

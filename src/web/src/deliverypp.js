@@ -15,7 +15,7 @@ const Deliverypp = {
     getPath() {
         switch(this.env) {
             case ENVIRONMENTS.DEV:
-                return '';
+                return 'http://localhost:8080';
             case ENVIRONMENTS.QA:
             case ENVIRONMENTS.PROD:
                 return ''

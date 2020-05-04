@@ -13,6 +13,8 @@ import MainLoader from './components/common/MainLoader';
 
 import AuthService from './services/AuthService';
 
+import { Route, Link, BrowserRouter as Router, Switch } from 'react-router-dom'
+
 const mainColor = '#940205';
 
 function App() {
@@ -112,33 +114,46 @@ function App() {
     )
   } else {
     return (
-      <div className="App">
+      <Router>
+        <div className="App">
 
-        <div className="alertContainer">
-          <Alert color={alertColor} isOpen={alertVisible} toggle={onAlertDismiss}>
-              {alertMessage}
-          </Alert>
-        </div>  
+          <div className="alertContainer">
+            <Alert color={alertColor} isOpen={alertVisible} toggle={onAlertDismiss}>
+                {alertMessage}
+            </Alert>
+          </div>  
 
-        <NavBar
-          isUserLoggedIn={isUserLoggedIn}
-          user={user}
-          onSignInClick={() => setShowRegisterLoginTab(true)}
-          onLogOutClick={onLogOutClick}
-          color={mainColor}
-        />
-        
-        {
-          showRegisterLoginTab && <RegisterLoginTab showModal={showRegisterLoginTab} toggle={toggleRegisterLoginTab} color={mainColor} showAlert={showAlert} onLogin={onLogin} />
-        }
+          <NavBar
+            isUserLoggedIn={isUserLoggedIn}
+            user={user}
+            onSignInClick={() => setShowRegisterLoginTab(true)}
+            onLogOutClick={onLogOutClick}
+            color={mainColor}
+          />
+          
+          {
+            showRegisterLoginTab && <RegisterLoginTab showModal={showRegisterLoginTab} toggle={toggleRegisterLoginTab} color={mainColor} showAlert={showAlert} onLogin={onLogin} />
+          }
 
-        <DeliveryppTab showAlert={showAlert} color={mainColor} isUserLoggedIn={isUserLoggedIn} user={user} />
+          <Switch>
+            <Route exact path="/" component={() => <DeliveryppTab showAlert={showAlert} color={mainColor} isUserLoggedIn={isUserLoggedIn} user={user} />} />
+            <Route component={Notfound} />
+          </Switch>
 
-        <Footer color={mainColor} />
-      </div>
+          <Footer color={mainColor} />
+        </div>
+      </Router>
     );
   }
 
+}
+
+function Notfound() {
+  return (
+    <div>
+      La página no fue encontrada
+    </div>
+  )
 }
 
 export default App;

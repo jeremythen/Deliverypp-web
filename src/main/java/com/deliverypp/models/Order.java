@@ -30,7 +30,7 @@ public class Order {
 
     @ManyToOne
     @JoinColumn(name = "location_id", nullable = false)
-    @JsonBackReference
+    //@JsonBackReference
     private Location location;
 
     @Column(name = "comment")

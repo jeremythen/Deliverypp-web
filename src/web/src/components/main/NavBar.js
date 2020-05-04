@@ -17,22 +17,27 @@ function NavBar({ onSignInClick, onLogOutClick, isUserLoggedIn, user}) {
         <NavbarBrand href="/">
             <span style={{color: '#940205'}}>Deliverypp</span>
         </NavbarBrand>
-        <Nav className="mr-auto" navbar>
-            <NavItem>
-                <NavLink href="/products">Productos</NavLink>
-            </NavItem>
-            
-        </Nav>
-
+        <Nav className="mr-auto" navbar></Nav>
+        {
+          /*
+            <Nav className="mr-auto" navbar>
+              <NavItem>
+                  <NavLink href="/products">Productos</NavLink>
+              </NavItem>
+            </Nav>
+          */
+        }
+        
         {
             isUserLoggedIn ?
-                    <>
-                        <span className="mr-1">{user.name}</span>
-                        <Button outline title="Salir" onClick={onLogOutClick} className="mr-1"><i className="fas fa-sign-out-alt"></i></Button>  
-                    </>
-                    
+                  <div>
+                      <span className="mr-1">{user.name}</span>
+                      <Button outline title="Salir" onClick={onLogOutClick} className="mr-1"><i className="fas fa-sign-out-alt"></i></Button>  
+                  </div>
                 :
-                    <Button outline title="Entrar" onClick={onSignInClick} className="mr-1"><i className="fas fa-sign-in-alt"></i></Button>
+                  <div>
+                      <Button outline title="Entrar" onClick={onSignInClick} className="mr-1"><i className="fas fa-sign-in-alt"></i></Button>
+                  </div>
         }
 
       </Navbar>

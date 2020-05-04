@@ -49,6 +49,8 @@ public class OrderServiceImpl implements OrderService {
 
         List<Order> orders = orderRepository.findAll();
 
+        orders.sort((orderA, orderB) -> orderB.getCreatedAt().compareTo(orderA.getCreatedAt()));
+
         DeliveryppResponse<List<Order>> response = new DeliveryppResponse<>();
 
         response
@@ -123,7 +125,7 @@ public class OrderServiceImpl implements OrderService {
 
             location.setLatitude(latitude);
 
-            location.setLatitude(longitude);
+            location.setLongitude(longitude);
 
             location.setUser(user);
 
