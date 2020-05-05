@@ -6,7 +6,7 @@ import static java.util.Objects.isNull;
 
 public enum OrderStatus {
 
-    ORDERED("ORDERED"), PAID("PAID"), TRANSIT("TRANSIT"), DELIVERED("DELIVERED");
+    ORDERED("ORDERED"), PAID("PAID"), ACQUIRING("ACQUIRING"), ACQUIRED("ACQUIRED"), TRANSIT("TRANSIT"), DELIVERED("DELIVERED");
 
     private String status;
 

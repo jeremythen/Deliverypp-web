@@ -1,8 +1,5 @@
 package com.deliverypp.models;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javax.persistence.*;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
