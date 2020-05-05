@@ -146,10 +146,10 @@
 	</build>
 	<profiles>
 		<profile>
-			<id>demo</id>
+			<id>qa</id>
 			<properties>
 				<spring.profiles.active>
-					demo
+					qa
 				</spring.profiles.active>
 			</properties>
 		</profile>

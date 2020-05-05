@@ -32,4 +32,5 @@ build/
 
 
 application.properties
-application-demo.properties
+application-prod.properties
+application-qa.properties
