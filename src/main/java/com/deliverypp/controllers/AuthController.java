@@ -45,6 +45,10 @@ public class AuthController {
 
         DeliveryppResponse<User> response = userService.save(user);
 
+        if(!response.isSuccess()) {
+            return ResponseEntity.badRequest().body(response);
+        }
+
         return ResponseEntity.ok(response);
 
     }

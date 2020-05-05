@@ -3,7 +3,9 @@ package com.deliverypp.services.order;
 import com.deliverypp.controllers.OrderController;
 import com.deliverypp.models.*;
 import com.deliverypp.repositories.*;
+import com.deliverypp.services.payment.StripeService;
 import com.deliverypp.services.product.ProductService;
+import com.deliverypp.services.stripe.StripeCustomerService;
 import com.deliverypp.services.user.UserService;
 import com.deliverypp.util.OrderStatus;
 import org.slf4j.Logger;
@@ -43,6 +45,12 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private StripeService stripeService;
+
+    @Autowired
+    private StripeCustomerService stripeCustomerService;
 
     @Transactional
     public DeliveryppResponse<List<Order>> getOrders() {
@@ -107,16 +115,15 @@ public class OrderServiceImpl implements OrderService {
 
             DeliveryppResponse<User> userServiceResponse = userService.findUserById(userId);
 
-            User user = null;
-
-            if(userServiceResponse.isSuccess()) {
-                user = userServiceResponse.getResponse();
-            } else {
+            if(!userServiceResponse.isSuccess()) {
                 response
                         .setStatus(ERROR)
                         .setSpecificStatus(USER_NOT_FOUND)
                         .setMessage("User not found.");
+                return response;
             }
+
+            User user = userServiceResponse.getResponse();
 
             Location location = new Location();
 
@@ -134,7 +141,7 @@ public class OrderServiceImpl implements OrderService {
             Order order = new Order();
 
             order.setComment(comment);
-            order.setStatus("ordered");
+            order.setStatus("ORDERED");
             order.setTotal(BigInteger.valueOf(total));
             order.setLocation(location);
             order.setUser(user);
@@ -147,17 +154,7 @@ public class OrderServiceImpl implements OrderService {
 
                 DeliveryppResponse<Product> productServiceResponse = productService.getProductById(id);
 
-                Product product = null;
-
-                if(productServiceResponse.isSuccess()) {
-                    product = productServiceResponse.getResponse();
-                } else {
-                    response
-                            .setStatus(ERROR)
-                            .setSpecificStatus(PRODUCT_NOT_AVAILABLE)
-                            .setMessage("Product with id " + id + " not available.");
-                    return response;
-                }
+                Product product = productServiceResponse.getResponse();
 
                 OrderLine orderLine = new OrderLine();
 
@@ -168,6 +165,37 @@ public class OrderServiceImpl implements OrderService {
                 orderLineRepository.save(orderLine);
 
             }
+
+            Map<String, Object> paymentParams = new HashMap<>();
+
+            DeliveryppResponse<?> stripeCustomerResponse = stripeCustomerService.findByUser(user);
+
+            if(!stripeCustomerResponse.isSuccess()) {
+                response
+                        .setStatus(ERROR)
+                        .setMessage("Stripe Customer user not found by Deliverypp User.");
+                return response;
+            }
+
+            StripeCustomer stripeCustomer = (StripeCustomer) stripeCustomerResponse.getResponse();
+
+            paymentParams.put("amount", "" + total);
+            paymentParams.put("customer", "" + total);
+            paymentParams.put("stripeCustomerId", stripeCustomer.getStripeCustomerId());
+
+            DeliveryppResponse<?> stripeServiceResponse = stripeService.makePayment(paymentParams);
+
+            if(!stripeServiceResponse.isSuccess()) {
+                response
+                        .setStatus(ERROR)
+                        .setMessage("Error making payment. " + stripeServiceResponse.getMessage());
+
+                return response;
+            }
+
+            newOrder.setStatus("PAID");
+
+            orderRepository.save(newOrder);
 
             response
                     .setStatus(SUCCESS)

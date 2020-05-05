@@ -1,14 +1,20 @@
 package com.deliverypp.services.user;
 
+import com.deliverypp.models.StripeCustomer;
 import com.deliverypp.models.User;
 import com.deliverypp.repositories.UserRepository;
 
+import com.deliverypp.services.payment.StripeService;
+import com.deliverypp.services.stripe.StripeCustomerService;
 import com.deliverypp.util.DeliveryppResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static com.deliverypp.util.DeliveryppResponseStatus.*;
@@ -16,6 +22,8 @@ import static com.deliverypp.util.DeliveryppResponse.*;
 
 @Service
 public class UserServiceImpl implements UserService {
+
+	private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
 	@Autowired
 	private UserRepository userRepository;
