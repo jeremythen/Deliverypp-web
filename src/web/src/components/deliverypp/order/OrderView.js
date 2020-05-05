@@ -2,22 +2,28 @@ import React, { useState, useEffect } from "react";
 
 import OrderTable from "./OrderTable";
 
-import Toolbar from "../../common/Toolbar";
-
 import OrderService from '../../../services/OrderService';
 
-import { Card, CardImg, CardText, CardBody, CardTitle, Button, Modal, ModalHeader, ModalBody, ModalFooter, TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap';
+import { Card, CardImg, CardText, CardBody, CardTitle, Button, Modal, ModalHeader, ModalBody, ModalFooter, TabContent, TabPane, Nav, NavItem, NavLink, FormGroup, Label, Input } from 'reactstrap';
 
 import {Map, Marker, GoogleApiWrapper} from 'google-maps-react';
 
 import './OrderView.css';
 
+import StatusClassMapper from './StatusClassMapper';
+
+const toggleTableSort = {id: false, username: false, email: false, telephone: false, createdAt: false, total: false, comment: false};
+
 function OrderView({ showAlert }) {
   const [orders, setOrders] = useState([]);
-  const [filterableOrders, setFilterableOrders] = useState([]);
-
+  const [tableData, setTableData] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState({orderLines: [], locations: []});
   const [showOrderedProductsModal, setShowOrderedProductsModal] = useState(false);
+  const [statusFilter, setStatusFilter] = useState('');
+
+  const transformToTableData = orders => {
+    return orders.map(({ user: { username, email, telephone }, status, id, createdAt, total, comment }) => ({ id, status, total, comment, createdAt, username, email, telephone  }));
+  }
 
   const getOrders = async () => {
 
@@ -26,7 +32,8 @@ function OrderView({ showAlert }) {
     if(responseData && responseData.success) {
       const orders = responseData.response;
         setOrders(orders);
-        setFilterableOrders(orders);
+        const tableData = transformToTableData(orders);
+        setTableData(tableData);
     } else {
       console.log('Error getting orders.')
       showAlert({ color: 'warning', message: 'Error getting orders.'});
@@ -38,15 +45,21 @@ function OrderView({ showAlert }) {
     getOrders();
   }, []);
 
-  const handleRowClick = order => {
-    setSelectedOrder(order);
-    setShowOrderedProductsModal(true);
+  const handleRowClick = orderId => {
+  
+    const order = orders.find(order => order.id === orderId)
+    if(order) {
+      setSelectedOrder(order);
+      setShowOrderedProductsModal(true);
+    }
+
   };
 
   const handleSearch = (event) => {
     const value = event.target.value;
+    const tableData = transformToTableData(orders);
     if(value) {
-        const filteredOrders = orders.filter(order => {
+        const filteredOrders = tableData.filter(order => {
             const keys = Object.keys(order);
             for(let key of keys) {
                 let propValue = order[key];
@@ -58,9 +71,9 @@ function OrderView({ showAlert }) {
                 }
             }
         });
-        setFilterableOrders(filteredOrders);
+        setTableData(filteredOrders);
     } else {
-        setFilterableOrders(orders);
+      setTableData(tableData);
     }
 
   }
@@ -73,6 +86,86 @@ function OrderView({ showAlert }) {
     setShowOrderedProductsModal(!showOrderedProductsModal);
   }
 
+  const onOrderStatusChange = (orderId, newStatus) => {
+
+    const newOrders = orders.map(order => {
+      if(order.id === orderId) {
+        order.status = newStatus;
+      }
+      return order;
+    })
+
+    setOrders(newOrders);
+
+    const mappedTableData = tableData.map(record => {
+      if(record.id === orderId) {
+        record.status = newStatus;
+        const order = orders.find(order => order.id === orderId);
+        setSelectedOrder(order);
+      }
+      return record;
+    });
+
+    
+    setTableData(mappedTableData);
+
+  }
+
+  const filterByStatus = event => {
+
+    const status = event.target.value;
+
+    const tableData = transformToTableData(orders);
+
+    if(!status) {
+      setStatusFilter('');
+      return setTableData(tableData);
+    }
+
+    const filteredOrders = tableData.filter(order => order.status === status);
+
+    setStatusFilter(status);
+    setTableData(filteredOrders);
+
+  }
+
+  const sortColumn = prop => {
+ 
+    const toggleSort = toggleTableSort[prop];
+
+    const compare = (value1, value2) => {
+      if(value1 < value2) {
+        return 1;
+      } else if (value1 > value2) {
+        return -1;
+      } else {
+        return 0;
+      }
+    }
+
+    const tableData = transformToTableData(orders);
+
+    tableData.sort((orderA, orderB) => {
+      
+      let value1 = orderA[prop];
+      let value2 = orderB[prop];
+
+      if(toggleSort) {
+        return compare(value1, value2);
+      } else {
+        return compare(value2, value1);
+      }
+
+    });
+
+    toggleTableSort[prop] = !toggleSort;
+
+    const newOrders = [...tableData];
+
+    setTableData(newOrders);
+
+  }
+
   return (
     <div className="OrderView">
       <WrappedAllLocationsMapContainer locations={orders.map(order => order.location)} />
@@ -83,24 +176,31 @@ function OrderView({ showAlert }) {
         orderLines={selectedOrder.orderLines}
         orderId={selectedOrder.id}
         location={selectedOrder.location}
+        orderStatus={selectedOrder.status}
+        showAlert={showAlert}
+        onOrderStatusChange={onOrderStatusChange}
        />
       <div>
-        <Toolbar
-        onSearch={handleSearch}
-          noActionButtons={true}
+        <OrderToolbar
+          onSearch={handleSearch}
+          orderStatus={statusFilter}
+          onOrderStatusChange={filterByStatus}
         />
       </div>
       <div className="Container mt-1">
         <OrderTable
-            orders={filterableOrders}
+            orders={tableData}
             onRowClick={handleRowClick}
+            onColumnClick={sortColumn}
         />
       </div>
     </div>
   );
 }
 
-function ProductDetailsModal({ onClose, showModal, toggleShowModal, orderLines, orderId, location }) {
+function ProductDetailsModal({ onClose, showModal, toggleShowModal, orderLines, orderId, location, orderStatus, showAlert, onOrderStatusChange }) {
+
+  console.log('orderId, orderStatus', orderId, orderStatus)
 
   const [activeTab, setActiveTab] = useState('orderProductsDetails');
 
@@ -108,37 +208,34 @@ function ProductDetailsModal({ onClose, showModal, toggleShowModal, orderLines, 
       if(activeTab !== tab) setActiveTab(tab);
   };
 
+  const handleStatusChange = async event => {
+    const newStatus = event.target.value;
+    const responseData = await OrderService.updateStatus(orderId, newStatus);
+    if(responseData && responseData.success) {
+      onOrderStatusChange(orderId, newStatus);
+    } else {
+      console.log('Error updating status.')
+      showAlert({ color: 'warning', message: 'Error actualizando el estado.'});
+    }
+
+  }
+
   return (
     <div>
       <Modal isOpen={showModal}>
         <ModalHeader toggle={toggleShowModal}>
           <CardText>Order #: {orderId}</CardText>
           <CardText>Productos ordenados</CardText>
+          <StatusSelect orderStatus={orderStatus} onOrderStatusChange={handleStatusChange} />
         </ModalHeader>
         <ModalBody>
             <Nav tabs>
               <NavItem>
-                <NavLink
-                  style={{ cursor: "pointer" }}
-                  className={activeTab === "orderProductsDetails" ? "active" : ""}
-                  onClick={() => {
-                    toggle("orderProductsDetails");
-                  }}
-                >
-                  Productos
-                </NavLink>
+                <NavLink style={{ cursor: "pointer" }} className={activeTab === "orderProductsDetails" ? "active" : ""} onClick={() => toggle("orderProductsDetails") }>Productos</NavLink>
               </NavItem>
 
               <NavItem>
-                <NavLink
-                  style={{ cursor: "pointer" }}
-                  className={activeTab === "orderProductsLocation" ? "active" : ""}
-                  onClick={() => {
-                    toggle("orderProductsLocation");
-                  }}
-                >
-                  Localización
-                </NavLink>
+                <NavLink style={{ cursor: "pointer" }} className={activeTab === "orderProductsLocation" ? "active" : ""} onClick={() => toggle("orderProductsLocation") }>Localización</NavLink>
               </NavItem>
             </Nav>
             <TabContent activeTab={activeTab}>
@@ -158,6 +255,55 @@ function ProductDetailsModal({ onClose, showModal, toggleShowModal, orderLines, 
       </Modal>
     </div>
   );
+}
+
+function OrderToolbar({ onSearch, orderStatus, onOrderStatusChange }) {
+
+  return (
+    <div className="Toolbar p-2 border rounded">
+      <div className="searchInputContainer p-1">
+          <div className="input-group">
+            <div className="input-group-prepend">
+              <span className="input-group-text" id="inputGroupPrepend2">
+                <i className="fa fa-search"></i>
+              </span>
+            </div>
+            <input
+                onChange={onSearch}
+                type="text"
+                className="form-control"
+                placeholder="Buscar"
+                aria-describedby="inputGroupPrepend2"
+                required
+            />
+            <div className="ml-2">
+              <StatusSelect orderStatus={orderStatus} onOrderStatusChange={onOrderStatusChange} />
+            </div>
+           
+          </div>
+      </div>
+
+
+      
+    </div>
+  );
+}
+
+function StatusSelect({ orderStatus, onOrderStatusChange }) {
+  return (
+    <div className="d-flex flex-row justify-content-center align-items-cente mr-2">
+      <Label className="mr-2" htmlFor="statusSelect">Estado</Label>
+      <Input style={{borderWidth: 2}} className={`border-${StatusClassMapper.getClassStatusClass(orderStatus)}`} type="select" id="statusSelect" value={orderStatus} onChange={onOrderStatusChange}>
+        <option value={''}></option>
+        <option value={'ORDERED'}>Ordenado</option>
+        <option value={'PAID'}>Pagado</option>
+        <option value={'ACQUIRING'}>Adquiriendo</option>
+        <option value={'ACQUIRED'}>Adquirido</option>
+        <option value={'TRANSIT'}>En Tránsito</option>
+        <option value={'DELIVERED'}>Entregado</option>
+      </Input>
+    </div>
+  )
 }
 
 function OrderedProductDetailsView({orderLines}) {
@@ -181,19 +327,21 @@ function OrderedProductDetailsView({orderLines}) {
         <Card key={product.id} style={{ marginBottom: 4, marginTop: 4 }}>
           
           {
-            imageHidden && <div className="imageIconContainer text-center" title="Mostrar image del producto" onClick={() => toggleImageHidden(product.id)}><i class="fas fa-image" style={{fontSize: 24, color: 'grey'}}></i></div>
+            imageHidden && <div className="imageIconContainer text-center" title="Mostrar image del producto" onClick={() => toggleImageHidden(product.id)}><i className="fas fa-image" style={{fontSize: 24, color: 'grey'}}></i></div>
           }
 
           {
-            !imageHidden && <CardImg
-                              top
-                              width="100%"
-                              src={product.imageUrl}
-                              alt={product.description}
-                              onClick={() => toggleImageHidden(product.id)}
-                              title="Ocultar imagel del producto"
-                              className="cardImgElem"
-                            />
+            !imageHidden && (
+              <CardImg
+                top
+                width="100%"
+                src={product.imageUrl}
+                alt={product.description}
+                onClick={() => toggleImageHidden(product.id)}
+                title="Ocultar imagel del producto"
+                className="cardImgElem"
+              />
+            )
           }
           
           <CardBody>
@@ -254,6 +402,7 @@ function AllLocationsMapContainer({ google, locations }) {
         {
           locations.map(location => (
             <Marker
+              key={location.id}
               title={'The marker`s title will appear as a tooltip.'}
               name={'SOMA'}
               position={{lat: location.latitude, lng: location.longitude}}

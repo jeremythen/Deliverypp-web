@@ -18,3 +18,12 @@
 .cardImgElem:hover {
     cursor: pointer;
 }
+
+.order-row.selected {
+   background-color: #d8d9da !important;
+}
+
+.OrderTable th:hover {
+    cursor: pointer;
+    background-color: rgb(236, 236, 236);
+}

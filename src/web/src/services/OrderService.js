@@ -85,6 +85,28 @@ const OrderService = {
         }
 
     },
+
+    async updateStatus(orderId, status) {
+
+        try {
+            
+            const token = localStorage.getItem('deliverypp_user_login_token');
+
+            const headers = {
+                Authorization: `Bearer ${token}`
+            };
+    
+            const response = await axios.put(`${basePath}/api/orders/${orderId}/status/${status}`, { headers });
+    
+            return this.handleResponse(response);
+    
+        } catch(e) {
+
+            return this.generateErrorResponse(e.message);
+
+        }
+
+    },
     
 };
 
