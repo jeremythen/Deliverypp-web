@@ -4,28 +4,16 @@ import { Table } from "reactstrap";
 
 import './OrderView.css';
 
-import StatusClassMapper from './StatusClassMapper';
+import StatusClassMapper from '../../../util/StatusClassMapper';
 
-const getTranslatedStatus = (status) => {
-
-  switch(status) {
-    case 'ORDERED':
-      return 'Ordenado';
-    case 'PAID':
-      return 'Pagado';
-    case 'ACQUIRING':
-      return 'Adquiriendo';
-    case 'ACQUIRED':
-      return 'Adquirido';
-    case 'TRANSIT':
-      return 'En Tránsito';
-    case 'DELIVERED':
-      return 'Entregado';
-    default:
-      return ''
-  }
-
-}
+const StatusTranslateMapper = {
+  ORDERED: 'Ordenado',
+  PAID: 'Pagado',
+  ACQUIRING: 'Adquiriendo',
+  ACQUIRED: 'Adquirido',
+  TRANSIT: 'Tránsito',
+  DELIVERED: 'Entregado'
+};
 
 function OrderTable(props) {
 
@@ -60,7 +48,7 @@ function OrderTable(props) {
             return (
               <tr className={`order-row ${activeRow && activeRow.id === order.id ? 'selected' : ''}`} key={order.id} onClick={() => handleOnRowClick(order)} >
                 <td>{order.id}</td>
-                <td className={`text-${StatusClassMapper.getClassStatusClass(order.status)}`}>{getTranslatedStatus(order.status)}</td>
+                <td className={`text-${StatusClassMapper.getClassStatusClass(order.status)}`}>{ StatusTranslateMapper[order.status] }</td>
                 <td>{order.username}</td>
                 <td>{order.email}</td>
                 <td>{order.telephone}</td>

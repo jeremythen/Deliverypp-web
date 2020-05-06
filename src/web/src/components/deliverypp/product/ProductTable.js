@@ -15,14 +15,16 @@ function ProductTable(props) {
         </tr>
       </thead>
       <tbody>
-        {props.products.map((product) => {
-          return <tr key={product.id} onClick={() => props.onClick(product)}>
-                    <td>{product.id}</td>
-                    <td>{product.category}</td>
-                    <td>{product.description}</td>
-                    <td>{product.price}</td>
-                </tr>;
-        })}
+        {
+          props.products.map(product => ( 
+            <tr key={product.id} onClick={() => props.onClick(product)}>
+              <td>{product.id}</td>
+              <td>{product.category}</td>
+              <td>{product.description}</td>
+              <td>{product.price}</td>
+            </tr>
+          ))
+        }
       </tbody>
     </Table>
   );

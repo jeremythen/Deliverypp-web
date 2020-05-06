@@ -1,4 +1,3 @@
-
 const StatusClassMapper = {
     statusMap: {
       ORDERED: 'danger',

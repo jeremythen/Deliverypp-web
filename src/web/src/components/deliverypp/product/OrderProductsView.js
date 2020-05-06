@@ -39,9 +39,9 @@ function OrderProductsView({ showAlert }) {
     };
 
     const getProductCards = () => {
-        return filterableProducts.map((product) => {
+        return filterableProducts.map(product => {
             const selected = product.id === selectedProductId ? 'selected' : '';
-            return <ProductCard key={product.id} {...product} onClick={onProductCardClick} selected={selected} />;
+            return <ProductCard key={product.id} product={product} onClick={onProductCardClick} selected={selected} />;
         });
       };
 

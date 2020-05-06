@@ -1,28 +1,28 @@
 
 import React from 'react';
 
-import {
-    Card, CardImg, CardText, CardBody,
-    CardTitle
-  } from 'reactstrap';
+import { Card, CardImg, CardText, CardBody, CardTitle } from 'reactstrap';
   
 import './ProductCard.css';
 
-function ProductCard(props) {
+function ProductCard({ product, selected, onClick }) {
+
+    const { imageUrl, description, category, price } = product;
+
     return (
-        <div className={`ProductCard m-1 p-2 ${props.selected}`} onClick={() => props.onClick(props)}>
+        <div className={`ProductCard m-1 p-2 ${selected}`} onClick={() => onClick(product)}>
             <Card style={{ width: '18rem' }}>
-                <CardImg top width="100%" src={props.imageUrl} alt={props.description} />
+                <CardImg top width="100%" src={imageUrl} alt={description} />
                 <CardBody>
-                    <CardTitle>{props.category}</CardTitle>
+                    <CardTitle className="text-muted font-italic">{category}</CardTitle>
                     <CardText>
                         {
-                            props.description
+                            description
                         }
                     </CardText>
-                    <CardText>
+                    <CardText className="font-weight-bold text-success">
                         {
-                            `RD$${props.price}`
+                            `RD$${price}`
                         }
                     </CardText>
                 </CardBody>

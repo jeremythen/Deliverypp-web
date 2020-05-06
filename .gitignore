@@ -34,3 +34,4 @@ build/
 application.properties
 application-prod.properties
 application-qa.properties
+application-dev.properties
