@@ -1,30 +1,22 @@
 package com.deliverypp.models;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "order_lines")
-public class OrderLine {
+@Table(name = "categories")
+public class Category {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "order_line_id")
+    @Column(name = "product_id")
     private int id;
 
-    @ManyToOne
-    @JoinColumn(name = "order_id")
-    @JsonBackReference
-    private Order order;
+    @Column(nullable = false, unique = true)
+    private String key;
 
-    @ManyToOne
-    @JoinColumn(name = "product_id")
-    private Product product;
-
-    @Column(nullable = false)
-    private int quantity;
+    @Column(nullable = false, unique = true)
+    private String category;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
@@ -40,28 +32,20 @@ public class OrderLine {
         this.id = id;
     }
 
-    public Order getOrder() {
-        return order;
+    public String getKey() {
+        return key;
     }
 
-    public void setOrder(Order order) {
-        this.order = order;
+    public void setKey(String key) {
+        this.key = key;
     }
 
-    public Product getProduct() {
-        return product;
+    public String getCategory() {
+        return category;
     }
 
-    public void setProduct(Product product) {
-        this.product = product;
-    }
-
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
+    public void setCategory(String value) {
+        this.category = value;
     }
 
     public LocalDateTime getCreatedAt() {

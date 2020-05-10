@@ -1,6 +1,7 @@
 package com.deliverypp.services.order;
 
 import com.deliverypp.models.Order;
+import com.deliverypp.models.User;
 import com.deliverypp.util.DeliveryppResponse;
 
 import java.util.List;
@@ -17,5 +18,7 @@ public interface OrderService {
     DeliveryppResponse<Order> updateStatus(int orderId, String status);
 
     DeliveryppResponse<Order> updateOrder(Order order);
+
+    DeliveryppResponse<List<Order>> getUserOrders(User user);
 
 }

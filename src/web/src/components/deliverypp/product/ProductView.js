@@ -18,6 +18,7 @@ import {
 
 
 function ProductView({ showAlert }) {
+  showAlert = () => {};
   const [cardView, setCardView] = useState(true);
   const [selectedProductId, setSelectedProductId] = useState(-1);
 
@@ -92,11 +93,32 @@ function ProductView({ showAlert }) {
       showAlert({ color: 'success', message: 'Producto agregado.'});
       setShowModal(false);
     } else {
-      console.log('Error getting products')
+      console.log('Error adding products.');
       showAlert({ color: 'warning', message: 'Error agregando producto.'});
     }
 
   };
+
+  const cloneProduct = async () => {
+    
+    const responseData = await ProductService.cloneProduct(selectedProduct);
+
+    if(responseData && responseData.success) {
+
+      const newProduct = responseData.response;
+
+      const newProducts = [newProduct, ...products];
+
+      setProducts(newProducts);
+      filterProducts(newProducts, filter);
+      showAlert({ color: 'success', message: 'Producto clonado.'});
+      setShowModal(false);
+    } else {
+      console.log('Error cloning product');
+      showAlert({ color: 'warning', message: 'Error clonando producto.'});
+    }
+
+  }
 
   useEffect(() => {
 
@@ -132,6 +154,13 @@ function ProductView({ showAlert }) {
 
     setAction('add');
     setSelectedProduct({description: '', price: 0, imageUrl: '', category: ''});
+    setShowModal(true);
+
+  }
+
+  const showCloneProductForm = () => {
+
+    setAction('clone');
     setShowModal(true);
 
   }
@@ -206,6 +235,9 @@ function ProductView({ showAlert }) {
       case 'edit':
         updateProduct();
         break;
+      case 'clone':
+          cloneProduct();
+          break;
       default:
         console.error('Wrong operation.');
         break;
@@ -224,9 +256,11 @@ function ProductView({ showAlert }) {
   const getActionDescription = () => {
       switch(action) {
         case 'add':
-            return 'Agregar un producto';
+            return 'Agregar producto';
         case 'edit':
-            return 'Editar un producto';
+            return 'Editar producto';
+        case 'clone':
+          return 'Clonar producto';
         default:
           console.error('Wrong operation.');
           break;
@@ -269,6 +303,7 @@ function ProductView({ showAlert }) {
             onSearch={handleSearch}
             onEditClick={showEditProductForm}
             onAddClick={showAddProductForm}
+            onCloneClick={showCloneProductForm}
             onDeleteClick={handleDeleteProduct}
             disabled={selectedProductId === -1}
         />

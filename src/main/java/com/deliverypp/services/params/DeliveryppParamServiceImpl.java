@@ -6,6 +6,7 @@ import com.deliverypp.util.DeliveryppResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,6 +41,7 @@ public class DeliveryppParamServiceImpl implements DeliveryppParamService {
     @Override
     public DeliveryppResponse<?> updateParam(DeliveryppParam deliveryppParam) {
 
+        deliveryppParam.setUpdatedAt(LocalDateTime.now());
         deliveryppParamRepository.save(deliveryppParam);
 
         return DeliveryppResponse.newResponse()

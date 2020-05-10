@@ -1,8 +1,12 @@
 package com.deliverypp.controllers;
 
 import com.deliverypp.models.Order;
+import com.deliverypp.models.User;
 import com.deliverypp.services.order.OrderService;
-import com.deliverypp.services.order.OrderServiceImpl;
+import com.deliverypp.services.user.UserService;
+import com.deliverypp.services.user.request.UserRequestInfoService;
+import com.deliverypp.util.DeliveryppResponseStatus;
+import com.deliverypp.util.Roles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +19,7 @@ import java.util.Map;
 
 import com.deliverypp.util.DeliveryppResponse;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import static com.deliverypp.util.DeliveryppResponse.*;
@@ -25,12 +30,17 @@ import static com.deliverypp.util.DeliveryppResponse.*;
 public class OrderController {
 
     private OrderService orderService;
+    private UserService userService;
+    private UserRequestInfoService userRequestInfoService;
 
     private static final Logger logger = LoggerFactory.getLogger(OrderController.class);
 
+
     @Autowired
-    public OrderController(OrderServiceImpl orderService) {
+    public OrderController(OrderService orderService, UserService userService, UserRequestInfoService userRequestInfoService) {
         this.orderService = orderService;
+        this.userService = userService;
+        this.userRequestInfoService = userRequestInfoService;
     }
 
     @GetMapping()
@@ -101,6 +111,45 @@ public class OrderController {
         DeliveryppResponse<Order> response = orderService.updateStatus(id, status);
 
         return getDefaultResponse(response);
+
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<?> getUserOrders(@PathVariable int userId, HttpServletRequest httpServletRequest) {
+
+        DeliveryppResponse<User> userServiceResponse = userService.findUserById(userId);
+
+        if(!userServiceResponse.isSuccess()) {
+            DeliveryppResponse<List<Order>> response = DeliveryppResponse.newResponse();
+            response.setStatus(ERROR)
+                    .setMessage("User was not found.")
+                    .setSpecificStatus(DeliveryppResponseStatus.USER_NOT_FOUND);
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        User user = userServiceResponse.getResponse();
+
+        DeliveryppResponse<User> userRequestInfoServiceResponse = userRequestInfoService.getUserFromRequest(httpServletRequest);
+
+        User userMakingRequest = userRequestInfoServiceResponse.getResponse();
+
+        boolean isNotAdmin = !Roles.ADMIN.name().equals(userMakingRequest.getRole());
+        boolean isNotUsersOrders = user.getId() != userMakingRequest.getId();
+
+        logger.info("user: {}", user);
+        logger.info("userMakingRequest: {}", userMakingRequest);
+
+        if(isNotAdmin && isNotUsersOrders) {
+            DeliveryppResponse<List<Order>> response = DeliveryppResponse.newResponse();
+            response.setStatus(ERROR)
+                    .setMessage("User making request is not the user for whom the orders are being requested.")
+                    .setSpecificStatus(DeliveryppResponseStatus.USER_PHISHING);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+        }
+
+        DeliveryppResponse<List<Order>> response = orderService.getUserOrders(user);
+
+        return ResponseEntity.ok(response);
 
     }
 

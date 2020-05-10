@@ -11,9 +11,11 @@ import com.deliverypp.util.OrderStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static java.util.Objects.*;
@@ -55,9 +57,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public DeliveryppResponse<List<Order>> getOrders() {
 
-        List<Order> orders = orderRepository.findAll();
-
-        orders.sort((orderA, orderB) -> orderB.getCreatedAt().compareTo(orderA.getCreatedAt()));
+        List<Order> orders = orderRepository.findAll(Sort.by(Sort.Direction.DESC, "createdAt"));
 
         DeliveryppResponse<List<Order>> response = new DeliveryppResponse<>();
 
@@ -245,6 +245,8 @@ public class OrderServiceImpl implements OrderService {
 
             order.setStatus(status);
 
+            order.setUpdatedAt(LocalDateTime.now());
+
             orderRepository.save(order);
 
             response
@@ -269,6 +271,7 @@ public class OrderServiceImpl implements OrderService {
 
         DeliveryppResponse<Order> response = new DeliveryppResponse<>();
 
+        order.setUpdatedAt(LocalDateTime.now());
         Order savedOrder = orderRepository.save(order);
 
         response
@@ -277,6 +280,24 @@ public class OrderServiceImpl implements OrderService {
                 .setResponse(savedOrder);
 
         return response;
+
+    }
+
+    @Override
+    public DeliveryppResponse<List<Order>> getUserOrders(User user) {
+
+        List<Order> userOrders = orderRepository.findAllByUser(user);
+
+        DeliveryppResponse<List<Order>> response = new DeliveryppResponse<>();
+
+        for (Order userOrder : userOrders) {
+            userOrder.setUser(null);
+        }
+
+        return response
+                .setStatus(SUCCESS)
+                .setMessage("User orders retrieved.")
+                .setResponse(userOrders);
 
     }
 

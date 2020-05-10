@@ -1,12 +1,16 @@
 package com.deliverypp.services.product;
 
+import com.deliverypp.controllers.OrderController;
 import com.deliverypp.models.Product;
 import com.deliverypp.repositories.ProductRepository;
 import com.deliverypp.util.DeliveryppResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,7 +25,10 @@ public class ProductServiceImpl implements ProductService {
 
     private ProductRepository productRepository;
 
-    public ProductServiceImpl(@Autowired ProductRepository productRepository) {
+    private static final Logger logger = LoggerFactory.getLogger(OrderController.class);
+
+    @Autowired
+    public ProductServiceImpl(ProductRepository productRepository) {
         this.productRepository = productRepository;
     }
 
@@ -30,7 +37,7 @@ public class ProductServiceImpl implements ProductService {
 
         DeliveryppResponse<List<Product> >response = new DeliveryppResponse<>();
 
-        List<Product> products = productRepository.findAllByVisible(true);
+        List<Product> products = productRepository.findAllByVisibleOrderByCreatedAtDesc(true);
 
         response.setStatus(SUCCESS)
                 .setMessage("Retrieved products successfully")
@@ -92,18 +99,35 @@ public class ProductServiceImpl implements ProductService {
 
         DeliveryppResponse<Product> response = new DeliveryppResponse<>();
 
+        Optional<Product> oldProductOptional = productRepository.findById(product.getId());
+
+
+
+        if(oldProductOptional.isPresent()) {
+
+            Product oldProduct = oldProductOptional.get();
+            logger.info("oldProduct: {}", oldProduct);
+            if(oldProduct.getPrice() != product.getPrice()) {
+                return response.setStatus(ERROR)
+                                .setSpecificStatus(PRODUCT_PRICE_CHANGE_ERROR)
+                                .setMessage("Product price cannot change. Create a clone product with different price.");
+            }
+        }
+
         if(nonNull(product)) {
+
+            logger.info("newProduct: {}", product);
+
+            product.setUpdatedAt(LocalDateTime.now());
             productRepository.save(product);
-            response.setStatus(SUCCESS)
+            return response.setStatus(SUCCESS)
                     .setMessage("Product updated.")
                     .setResponse(product);
         } else {
-            response.setStatus(ERROR)
+            return response.setStatus(ERROR)
                     .setSpecificStatus(PRODUCT_EMPTY)
                     .setMessage("Product not provided.");
         }
-
-        return response;
 
     }
 
@@ -132,6 +156,28 @@ public class ProductServiceImpl implements ProductService {
         }
 
         return response;
+
+    }
+
+    @Override
+    public DeliveryppResponse<Product> cloneProduct(Product product) {
+
+        DeliveryppResponse<Product> response = new DeliveryppResponse<>();
+
+        if(isNull(product)) {
+            return response.setStatus(ERROR)
+                    .setSpecificStatus(PRODUCT_EMPTY)
+                    .setMessage("Product not provided.");
+        }
+
+        product.setId(0);
+        product.setCreatedAt(LocalDateTime.now());
+
+        Product newProduct = productRepository.save(product);
+
+        return response.setStatus(SUCCESS)
+                .setMessage("Product cloned.")
+                .setResponse(newProduct);
 
     }
 

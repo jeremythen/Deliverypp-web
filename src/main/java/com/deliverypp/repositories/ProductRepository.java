@@ -12,6 +12,8 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 
     List<Product> findAllByVisible(boolean visible);
 
+    List<Product> findAllByVisibleOrderByCreatedAtDesc(boolean visible);
+
     Optional<Product> findByIdAndVisible(int id, boolean visible);
 
     boolean existsByIdAndVisible(int id, boolean visible);

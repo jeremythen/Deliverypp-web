@@ -17,6 +17,8 @@ public interface ProductService {
 
     DeliveryppResponse<?> deleteProduct(int productId);
 
+    DeliveryppResponse<Product> cloneProduct(Product product);
+
     boolean existsById(int id);
 
 }

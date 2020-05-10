@@ -9,7 +9,7 @@ import OrderProductsView from './product/OrderProductsView';
 
 function DeliveryppTab(props) {
 
-    const [activeTab, setActiveTab] = useState('available_products');
+    const [activeTab, setActiveTab] = useState('product');
 
     const toggle = tab => {
         if(activeTab !== tab) setActiveTab(tab);
@@ -45,17 +45,26 @@ function DeliveryppTab(props) {
     <div className="container-md p-1 border mb-8">
 
       <Nav tabs>
-        <NavItem>
-          <NavLink style={{cursor: 'pointer'}} className={ activeTab === 'available_products' ? 'active' : '' } onClick={() => { toggle('available_products'); }}>Productos Disponibles</NavLink>
-        </NavItem>
+        {
+          false && (
+            <NavItem>
+              <NavLink style={{cursor: 'pointer'}} className={ activeTab === 'available_products' ? 'active' : '' } onClick={() => { toggle('available_products'); }}>Productos Disponibles</NavLink>
+            </NavItem>
+          )
+        }
+        
         {
             props.isUserLoggedIn && props.user.role === 'ADMIN' && getAdminTabNavItems()
         }
       </Nav>
       <TabContent activeTab={activeTab}>
-        <TabPane tabId="available_products">
-          <OrderProductsView showAlert={props.showAlert} />
-        </TabPane>
+        {
+          false && (
+            <TabPane tabId="available_products">
+              <OrderProductsView showAlert={props.showAlert} />
+            </TabPane>
+          )
+        }
         {
             props.isUserLoggedIn && props.user.role === 'ADMIN' && getAdminTabPanes()
         }

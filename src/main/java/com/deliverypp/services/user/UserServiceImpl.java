@@ -1,11 +1,8 @@
 package com.deliverypp.services.user;
 
-import com.deliverypp.models.StripeCustomer;
 import com.deliverypp.models.User;
 import com.deliverypp.repositories.UserRepository;
 
-import com.deliverypp.services.payment.StripeService;
-import com.deliverypp.services.stripe.StripeCustomerService;
 import com.deliverypp.util.DeliveryppResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +11,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import static com.deliverypp.util.DeliveryppResponseStatus.*;
@@ -83,17 +79,14 @@ public class UserServiceImpl implements UserService {
 					.setStatus(SUCCESS)
 					.setMessage("User retrieved successfully")
 					.setResponse(optionalUser.get());
-			return response;
 		} else {
 			response
 					.setStatus(ERROR)
 					.setSpecificStatus(USER_NOT_FOUND)
-					.setMessage("Not a valid user.")
-					.setResponse(optionalUser.get());
-			return response;
+					.setMessage("Not a valid user.");
 		}
+		return response;
 
 	}
-
 
 }

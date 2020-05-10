@@ -1,5 +1,8 @@
 
 const ENVIRONMENTS = {
+    getActiveEnv() {
+        return Deliverypp;
+    },
     DEV: 'dev',
     QA: 'qa',
     PROD: 'prod'
@@ -15,10 +18,10 @@ const Deliverypp = {
     getPath() {
         switch(this.env) {
             case ENVIRONMENTS.DEV:
-                return 'http://localhost:8080';
+                return '';
             case ENVIRONMENTS.QA:
             case ENVIRONMENTS.PROD:
-                return 'http://localhost:8080'
+                return ''
             default:
                 console.error('Wrong operation.');
                 break;
