@@ -13,8 +13,8 @@ function DModal(props) {
                 }
             </ModalBody>
             <ModalFooter>
-            <Button color="success" onClick={props.onSave}>Guardar</Button>{' '}
-            <Button color="secondary" onClick={props.onCancel}>Cancelar</Button>
+                <Button color="success" onClick={props.onSave}>Guardar</Button>{' '}
+                <Button color="secondary" onClick={props.onCancel}>Cancelar</Button>
             </ModalFooter>
         </Modal>
         </div>

@@ -26,7 +26,7 @@ function ProductDetailsModal({ onClose, showModal, toggleShowModal, order, showA
       if(responseData && responseData.success) {
         onOrderStatusChange(orderId, newStatus);
       } else {
-        console.log('Error updating status.')
+        console.error('Error updating status.')
         showAlert({ color: 'warning', message: 'Error actualizando el estado.'});
       }
   

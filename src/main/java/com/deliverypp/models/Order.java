@@ -1,7 +1,6 @@
 package com.deliverypp.models;
 
 import javax.persistence.*;
-import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -19,7 +18,7 @@ public class Order {
     private User user;
 
     @Column(nullable = false)
-    private BigInteger total;
+    private int total;
 
     @Column(nullable = false, length = 50)
     private String status;
@@ -57,11 +56,11 @@ public class Order {
         this.user = user;
     }
 
-    public BigInteger getTotal() {
+    public int getTotal() {
         return total;
     }
 
-    public void setTotal(BigInteger total) {
+    public void setTotal(int total) {
         this.total = total;
     }
 

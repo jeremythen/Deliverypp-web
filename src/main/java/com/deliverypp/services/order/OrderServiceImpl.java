@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.*;
 
@@ -105,13 +106,12 @@ public class OrderServiceImpl implements OrderService {
         if(paramsAreValid) {
 
             int userId = (int) requestMap.get("userId");
-            int total = (int) requestMap.get("total");
 
             Map<String, Double> locationMap = (Map<String, Double>) requestMap.get("location");
 
             String comment = (String) requestMap.get("comment");
 
-            List<Map<String, Integer>> orderedProducts = (List<Map<String, Integer>>) requestMap.get("products");
+            List<Map<String, Integer>> orderedProductsMaps = (List<Map<String, Integer>>) requestMap.get("products");
 
             DeliveryppResponse<User> userServiceResponse = userService.findUserById(userId);
 
@@ -142,15 +142,12 @@ public class OrderServiceImpl implements OrderService {
 
             order.setComment(comment);
             order.setStatus("ORDERED");
-            order.setTotal(BigInteger.valueOf(total));
             order.setLocation(location);
             order.setUser(user);
 
-            Order newOrder = orderRepository.save(order);
-
-            for(Map<String, Integer> orderedProduct : orderedProducts) {
-                int id = orderedProduct.get("id");
-                int quantity = orderedProduct.get("quantity");
+            List<OrderLine> orderLineList = orderedProductsMaps.stream().map(productMap -> {
+                int id = productMap.get("id");
+                int quantity = productMap.get("quantity");
 
                 DeliveryppResponse<Product> productServiceResponse = productService.getProductById(id);
 
@@ -160,11 +157,24 @@ public class OrderServiceImpl implements OrderService {
 
                 orderLine.setProduct(product);
                 orderLine.setQuantity(quantity);
-                orderLine.setOrder(newOrder);
+                orderLine.setOrder(order);
+                orderLine.setTotal(quantity * product.getPrice());
 
+                return orderLine;
+
+            }).collect(Collectors.toList());
+
+            orderLineList.forEach(orderLine -> {
                 orderLineRepository.save(orderLine);
+            });
 
-            }
+            int totalAmount = orderLineList.stream()
+                    .mapToInt(orderLine -> orderLine.getTotal())
+                    .sum();
+
+            order.setTotal(totalAmount);
+
+            orderRepository.save(order);
 
             Map<String, Object> paymentParams = new HashMap<>();
 
@@ -179,8 +189,7 @@ public class OrderServiceImpl implements OrderService {
 
             StripeCustomer stripeCustomer = (StripeCustomer) stripeCustomerResponse.getResponse();
 
-            paymentParams.put("amount", "" + total);
-            paymentParams.put("customer", "" + total);
+            paymentParams.put("amount", "" + totalAmount);
             paymentParams.put("stripeCustomerId", stripeCustomer.getStripeCustomerId());
 
             DeliveryppResponse<?> stripeServiceResponse = stripeService.makePayment(paymentParams);
@@ -193,14 +202,14 @@ public class OrderServiceImpl implements OrderService {
                 return response;
             }
 
-            newOrder.setStatus("PAID");
+            order.setStatus("PAID");
 
-            orderRepository.save(newOrder);
+            orderRepository.save(order);
 
             response
                     .setStatus(SUCCESS)
                     .setMessage("Successfully created order.")
-                    .setResponse(newOrder);
+                    .setResponse(order);
 
             return response;
         } else {
@@ -312,7 +321,6 @@ public class OrderServiceImpl implements OrderService {
         if(nonNull(requestMap)) {
 
             Object userIdObj = requestMap.get("userId");
-            Object totalObj = requestMap.get("total");
             Object locationObj = requestMap.get("location");
 
             if(!(userIdObj instanceof Integer)) {
@@ -330,24 +338,6 @@ public class OrderServiceImpl implements OrderService {
                     validationList.add(validateMap);
                     validateMap.put("message", "Invalid userId");
                     validateMap.put("code", "USER_INVALID_USER_ID");
-                }
-            }
-
-            if(!(totalObj instanceof Integer)) {
-                Map<String, String> validateMap = new HashMap<>();
-                valid = false;
-                validationList.add(validateMap);
-                validateMap.put("message", "total not provided.");
-                validateMap.put("code", "ORDER_TOTAL_NOT_PROVIDED");
-            } else {
-                int total = (int) totalObj;
-
-                if(total <= 0) {
-                    Map<String, String> validateMap = new HashMap<>();
-                    valid = false;
-                    validationList.add(validateMap);
-                    validateMap.put("message", "Total cannot be 0 or negative.");
-                    validateMap.put("code", "ORDER_TOTAL_INVALID");
                 }
             }
 

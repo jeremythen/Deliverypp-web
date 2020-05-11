@@ -182,6 +182,21 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public DeliveryppResponse<List<Product>> findAllById(List<Integer> productIds) {
+        logger.info("productIds: {}", productIds);
+        DeliveryppResponse<List<Product> >response = new DeliveryppResponse<>();
+
+        List<Product> products = productRepository.findAllById(productIds);
+
+        response.setStatus(SUCCESS)
+                .setMessage("Retrieved products successfully")
+                .setResponse(products);
+
+        return response;
+
+    }
+
+    @Override
     public boolean existsById(int id) {
         return productRepository.existsByIdAndVisible(id, true);
     }

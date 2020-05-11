@@ -34,7 +34,7 @@ function OrderView({ showAlert }) {
         const tableData = transformToTableData(orders);
         setTableData(tableData);
     } else {
-      console.log('Error getting orders.', responseData);
+      console.error('Error getting orders.', responseData);
       showAlert({ color: 'warning', message: 'Error getting orders.'});
     }
 

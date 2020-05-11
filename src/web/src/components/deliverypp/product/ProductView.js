@@ -5,79 +5,68 @@ import ProductTable from "./ProductTable";
 
 import "./ProductView.css";
 
-import Toolbar from '../../common/Toolbar';
+import Toolbar from './Toolbar';
 
 import ProductService from '../../../services/ProductService';
 
 import Modal from '../../common/Modal';
 
-import {
-    Card, CardImg, CardText, CardBody,
-    CardTitle, Input, Label
-  } from 'reactstrap';
+import ProductActionForm from './ProductActionForm';
 
+import Alert from '../../common/Alert';
 
-function ProductView({ showAlert }) {
-  showAlert = () => {};
-  const [cardView, setCardView] = useState(true);
-  const [selectedProductId, setSelectedProductId] = useState(-1);
+function ProductView() {
 
-  const [products, setProducts] = useState([]);
-  const [filterableProducts, setFilterableProducts] = useState([]);
+  const [cardView, setCardView] = useState(() => true);
+  const [selectedProductId, setSelectedProductId] = useState(() => -1);
+  const [products, setProducts] = useState(() => []);
+  const [filterableProducts, setFilterableProducts] = useState(() => []);
+  const [showModal, setShowModal] = useState(() => false);
+  const [action, setAction] = useState(() => 'add');
+  const [selectedProduct, setSelectedProduct] = useState(() => ({description: '', price: 0, imageUrl: '', category: ''}));
+  const [filter, setFilter] = useState(() => '');
+  const [categoryFilter, setCategoryFilter] = useState(() => '');
+  const [alertState, setAlertState] = useState(() => ({ color: 'success', show: false, message: '' }));
 
-  const [showModal, setShowModal] = useState(false);
-
-  const [action, setAction] = useState('add');
-
-  const [selectedProduct, setSelectedProduct] = useState({description: '', price: 0, imageUrl: '', category: ''});
-
-  const [filter, setFilter] = useState('');
+  const showAlert = alert => {
+    setAlertState(alert);
+    setTimeout(() => {
+      setAlertState({ color: 'success', show: false, message: '' });
+    }, 2000);
+  }
 
   const getProducts = async () => {
-
     const responseData = await ProductService.getProducts();
     if(responseData && responseData.success) {
       const products = responseData.response;
       setProducts(products);
         setFilterableProducts(products);
-        
     } else {
-      console.log('Error getting products')
+      console.error('Error getting products')
       showAlert({ color: 'warning', message: 'Error obteniendo productos.'});
     }
-
   };
 
   const createProduct = async () => {
-
     const responseData = await ProductService.addProduct(selectedProduct);
-
     if(responseData && responseData.success) {
-
       const newProduct = responseData.response;
-
       const newProducts = [newProduct, ...products];
-
       setProducts(newProducts);
-      filterProducts(newProducts, filter);
+      filterByCategoryAndSearchText(categoryFilter, filter, newProducts);
       showAlert({ color: 'success', message: 'Producto agregado.'});
       setShowModal(false);
     } else {
-      console.log('Error getting products')
+      console.error('Error getting products')
       showAlert({ color: 'warning', message: 'Error agregando producto.'});
     }
     
   };
   const updateProduct = async () => {
-
     const responseData = await ProductService.updateProduct(selectedProduct);
-
     if(responseData && responseData.success) {
-
       const newProduct = responseData.response;
-
       const newProducts = [...products];
-
       newProducts.forEach(product => {
         if(product.id === newProduct.id) {
           product.description = newProduct.description;
@@ -87,43 +76,35 @@ function ProductView({ showAlert }) {
           return false;
         }
       });
-
       setProducts(newProducts);
-      filterProducts(newProducts, filter);
+      filterByCategoryAndSearchText(categoryFilter, filter, newProducts);
       showAlert({ color: 'success', message: 'Producto agregado.'});
       setShowModal(false);
     } else {
-      console.log('Error adding products.');
+      console.error('Error adding products.');
       showAlert({ color: 'warning', message: 'Error agregando producto.'});
     }
 
   };
 
   const cloneProduct = async () => {
-    
     const responseData = await ProductService.cloneProduct(selectedProduct);
-
     if(responseData && responseData.success) {
-
       const newProduct = responseData.response;
-
       const newProducts = [newProduct, ...products];
-
       setProducts(newProducts);
-      filterProducts(newProducts, filter);
+      filterByCategoryAndSearchText(categoryFilter, filter, newProducts);
       showAlert({ color: 'success', message: 'Producto clonado.'});
       setShowModal(false);
     } else {
-      console.log('Error cloning product');
+      console.error('Error cloning product');
       showAlert({ color: 'warning', message: 'Error clonando producto.'});
     }
 
   }
 
   useEffect(() => {
-
     getProducts();
-
   }, []);
 
   const onProductCardClick = product => {
@@ -143,91 +124,88 @@ function ProductView({ showAlert }) {
   };
 
   const showEditProductForm = () => {
-
     setAction('edit');
-
     setShowModal(true);
-
   }
 
   const showAddProductForm = () => {
-
     setAction('add');
     setSelectedProduct({description: '', price: 0, imageUrl: '', category: ''});
     setShowModal(true);
-
   }
 
   const showCloneProductForm = () => {
-
     setAction('clone');
     setShowModal(true);
-
   }
 
   const handleDeleteProduct = async () => {
-
     const deleteProductConfirm = window.confirm('Seguro quiere borrar el producto seleccionado?');
-
     if(deleteProductConfirm) {
-
       const responseData = await ProductService.deleteProductById(selectedProductId);
-
       if(responseData && responseData.success) {
         showAlert({ color: 'success', message: 'Producto eliminado.'});
-        const filteredProducts = products.filter(product => product.id !== selectedProductId);
+        let filteredProducts = products.filter(product => product.id !== selectedProductId);
         setProducts(filteredProducts);
-        filterProducts(filteredProducts, filter);
+        filterByCategoryAndSearchText(categoryFilter, filter, filteredProducts);
       } else {
-        console.log('Error deleting product.')
+        console.error('Error deleting product.')
         showAlert({ color: 'warning', message: 'Error eliminando producto.'});
       }
     }
-
   };
 
-  const filterProducts = (products, value) => {
+  const filterProducts = (value, products) => {
     if(value) {
-
       const filteredProducts = products.filter(product => {
-
           const keys = Object.keys(product);
-
           for(let key of keys) {
-
               if(key === 'category' || key === 'price' || key === 'description') {
                   let propValue = product[key];
                   if(propValue) {
                       propValue = '' + propValue;
-                      if(propValue.includes(value)) {
+                      if(propValue.toLowerCase().includes(value.toLowerCase())) {
                           return true;
                       }
                   }
               }
-              
           }
-
           return false;
-
       });
-      setFilterableProducts(filteredProducts);
+      return filteredProducts;
+    }
 
-  } else {
-      setFilterableProducts(products);
+    return products;
+
   }
+
+  const onCategoryChange = category => {
+    setCategoryFilter(category);
+    filterByCategoryAndSearchText(category, filter, products);
+  }
+
+  const filterProductByCategory = (category, products) => {
+    if(!category) {
+      return products;
+    }
+    const filteredProducts = products.filter(product => product.category === category);
+    return filteredProducts;
+  }
+
+  const filterByCategoryAndSearchText = (category, searchText) => {
+    let filteredProducts = filterProductByCategory(category, products);
+    filteredProducts = filterProducts(searchText, filteredProducts);
+    setFilterableProducts(filteredProducts);
   }
 
   const handleSearch = (event) => {
-
     const value = event.target.value;
-
-    setFilter(value);
-    filterProducts(products, value);
-
+    const returnedFromSetFilter = setFilter(value);
+    console.error('returnedFromSetFilter', returnedFromSetFilter)
+    filterByCategoryAndSearchText(categoryFilter, value, products);
   }
 
   const onSave = () => {
-
     switch(action) {
       case 'add':
         createProduct();
@@ -242,7 +220,6 @@ function ProductView({ showAlert }) {
         console.error('Wrong operation.');
         break;
     }
-
   }
 
   const onCancel = () => {
@@ -254,151 +231,53 @@ function ProductView({ showAlert }) {
   }
 
   const getActionDescription = () => {
-      switch(action) {
-        case 'add':
-            return 'Agregar producto';
-        case 'edit':
-            return 'Editar producto';
-        case 'clone':
-          return 'Clonar producto';
-        default:
-          console.error('Wrong operation.');
-          break;
-      }
+    switch(action) {
+      case 'add':
+          return 'Agregar producto';
+      case 'edit':
+          return 'Editar producto';
+      case 'clone':
+        return 'Clonar producto y ocultar original';
+      default:
+        console.error('Wrong operation.');
+        break;
+    }
   }
 
   const onProductUpdate = product => {
-
     setSelectedProduct(product);
-
   }
 
   return (
     <div className="ProductView">
-    <Modal
-        onSave={onSave}
-        onCancel={onCancel}
-        showModal={showModal}
-        toggle={toggle}
-        title={getActionDescription()}
-    >
-        <ProductActionForm imageUrl={'product.png'} onProductUpdate={onProductUpdate} product={selectedProduct} />
-    </Modal>
 
-      {false && (
-        <div>
-          <button className="btn btn-primary" onClick={() => setCardView(true)}>
-            Card View
-          </button>
-          <button
-            className="btn btn-secondary"
-            onClick={() => setCardView(false)}
-          >
-            Card Table
-          </button>
-        </div>
-      )}
+      <Alert {...alertState} />
 
-        <Toolbar
-            onSearch={handleSearch}
-            onEditClick={showEditProductForm}
-            onAddClick={showAddProductForm}
-            onCloneClick={showCloneProductForm}
-            onDeleteClick={handleDeleteProduct}
-            disabled={selectedProductId === -1}
-        />
+      <Modal
+          onSave={onSave}
+          onCancel={onCancel}
+          showModal={showModal}
+          toggle={toggle}
+          title={getActionDescription()}
+      >
+          <ProductActionForm imageUrl={'product.png'} action={action} onProductUpdate={onProductUpdate} product={selectedProduct} />
+      </Modal>
+
+      <Toolbar
+          onSearch={handleSearch}
+          onEditClick={showEditProductForm}
+          onAddClick={showAddProductForm}
+          onCloneClick={showCloneProductForm}
+          onDeleteClick={handleDeleteProduct}
+          disabled={selectedProductId === -1}
+          onCategoryChange={onCategoryChange}
+      />
 
       <div>
-        {cardView ? (
-          <div className="ProductCardContainer">{getProductCards()}</div>
-        ) : (
-          <div className="ProductTableContainer">{getProductTable()}</div>
-        )}
+        <div className="ProductCardContainer">{getProductCards()}</div>
       </div>
     </div>
   );
-}
-
-function ProductActionForm(props) {
-
-
-    const onImageUrlChange = (e) => {
-
-        let value = e.target.value;
-
-        if(!value) {
-            value = 'product.png';
-        }
-
-        const product = {...props.product};
-
-        product.imageUrl = value;
-
-        props.onProductUpdate(product);
-
-    }
-
-    const onCategoryChange = (e) => {
-
-        const value = e.target.value;
-
-        const product = {...props.product};
-
-        product.category = value;
-
-        props.onProductUpdate(product);
-
-    }
-
-    const onDescriptionChange = (e) => {
-
-        const value = e.target.value;
-
-        const product = {...props.product};
-
-        product.description = value;
-
-        props.onProductUpdate(product);
-
-    }
-
-    const onPriceChange = (e) => {
-
-        const value = e.target.value;
-
-        const product = {...props.product};
-
-        product.price = value;
-
-        props.onProductUpdate(product);
-
-    }
-
-    const imageUrl = props.product.imageUrl ? props.product.imageUrl : 'product.png';
-
-    return (
-        <div>
-        <Card>
-            <CardImg top width="100%" src={imageUrl} />
-            <CardBody>
-                <CardTitle>
-                    <Input type="text" name="category" id="category" placeholder="Categoría" value={props.product.category} onChange={onCategoryChange} />
-                </CardTitle>
-                <CardText>
-                    <Label for="imageUrl">URL de la imagen</Label>
-                    <Input type="url" name="imageUrl" id="imageUrl"  value={imageUrl} onChange={onImageUrlChange}/>
-                </CardText>
-                <CardText>
-                    <Label for="description">Descripción</Label>
-                    <Input type="textarea" name="description" id="description" value={props.product.description} onChange={onDescriptionChange} />
-                </CardText>
-                <CardText>
-                    <Input type="number" name="price" id="price" placeholder="Precio"  value={props.product.price} onChange={onPriceChange}/>
-                </CardText>
-            </CardBody>
-        </Card>
-    </div>
-    )
 }
 
 export default ProductView;

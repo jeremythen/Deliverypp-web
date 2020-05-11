@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 
-import ProductView from './product/ProductView';
-import OrderView from './order/OrderView';
-
 import { TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap';
 
-import OrderProductsView from './product/OrderProductsView';
+import ProductView from './product/ProductView';
+import OrderView from './order/OrderView';
+import CategoryView from './category/CategoryView';
 
 function DeliveryppTab(props) {
 
@@ -21,8 +20,13 @@ function DeliveryppTab(props) {
                 <NavItem>
                     <NavLink style={{cursor: 'pointer'}} className={ activeTab === 'product' ? 'active' : '' } onClick={() => { toggle('product'); }}>Productos</NavLink>
                 </NavItem>
+
                 <NavItem>
                     <NavLink style={{cursor: 'pointer'}} className={ activeTab === 'orders' ? 'active' : '' } onClick={() => { toggle('orders'); }} >Ordenes</NavLink>
+                </NavItem>
+
+                <NavItem>
+                    <NavLink style={{cursor: 'pointer'}} className={ activeTab === 'categories' ? 'active' : '' } onClick={() => { toggle('categories'); }} >Categorías</NavLink>
                 </NavItem>
             </>  
         );
@@ -34,9 +38,15 @@ function DeliveryppTab(props) {
                 <TabPane tabId="product">
                     <ProductView showAlert={props.showAlert} />
                 </TabPane>
+
                 <TabPane tabId="orders">
                     <OrderView showAlert={props.showAlert} />
                 </TabPane>
+
+                <TabPane tabId="categories">
+                    <CategoryView showAlert={props.showAlert} />
+                </TabPane>
+
             </>
         )
     }
@@ -46,25 +56,10 @@ function DeliveryppTab(props) {
 
       <Nav tabs>
         {
-          false && (
-            <NavItem>
-              <NavLink style={{cursor: 'pointer'}} className={ activeTab === 'available_products' ? 'active' : '' } onClick={() => { toggle('available_products'); }}>Productos Disponibles</NavLink>
-            </NavItem>
-          )
-        }
-        
-        {
             props.isUserLoggedIn && props.user.role === 'ADMIN' && getAdminTabNavItems()
         }
       </Nav>
       <TabContent activeTab={activeTab}>
-        {
-          false && (
-            <TabPane tabId="available_products">
-              <OrderProductsView showAlert={props.showAlert} />
-            </TabPane>
-          )
-        }
         {
             props.isUserLoggedIn && props.user.role === 'ADMIN' && getAdminTabPanes()
         }

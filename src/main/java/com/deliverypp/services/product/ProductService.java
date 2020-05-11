@@ -19,6 +19,8 @@ public interface ProductService {
 
     DeliveryppResponse<Product> cloneProduct(Product product);
 
+    DeliveryppResponse<List<Product>> findAllById(List<Integer> productIds);
+
     boolean existsById(int id);
 
 }

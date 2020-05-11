@@ -7,7 +7,6 @@ function OrderedProductDetailsView({orderLines}) {
     const [mappedOrderLines, setMappedOrderLines] = useState(orderLines.map(orderLine => ({ ...orderLine, imageHidden: true })));
   
     const toggleImageHidden = (id) => {
-      console.log('id', id)
       const newMappedOrderLines = mappedOrderLines.map(orderLine => {
         if(orderLine.product.id === id) {
           orderLine.imageHidden = !orderLine.imageHidden;

@@ -23,7 +23,7 @@ function OrderProductsView({ showAlert }) {
               setFilterableProducts(products);
               
           } else {
-            console.log('Error getting products')
+            console.error('Error getting products')
             showAlert({ color: 'warning', message: 'Error obteniendo productos.'});
           }
 

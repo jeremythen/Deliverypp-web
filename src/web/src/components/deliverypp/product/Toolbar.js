@@ -2,11 +2,11 @@ import React from "react";
 
 import './Toolbar.css';
 
-import CategorySelect from '../deliverypp/product/CategorySelect';
+import CategorySelect from './CategorySelect';
 
 function Toolbar(props) {
   return (
-    <div className="Toolbar p-2 border rounded">
+    <div className="Toolbar d-flex flex-wrap p-2 border rounded">
       <div className="searchInputContainer p-1">
           <div className="input-group">
             <div className="input-group-prepend">
@@ -25,7 +25,7 @@ function Toolbar(props) {
           </div>
       </div>
 
-      <CategorySelect />
+      <CategorySelect onCategoryChange={props.onCategoryChange} />
 
       <div className="actionButtonsContainer p-1">
         <button onClick={props.onEditClick} disabled={props.disabled} className="btn btn-secondary mr-1" title="Editar Producto">
@@ -36,7 +36,7 @@ function Toolbar(props) {
           <i className="fa fa-plus"></i>
         </button>
 
-        <button onClick={props.onCloneClick} disabled={props.disabled} className="btn btn-secondary mr-1" title="Clonar Producto">
+        <button onClick={props.onCloneClick} disabled={props.disabled} className="btn btn-secondary mr-1" title="Clonar Producto y ocultar original">
           <i className="fa fa-copy"></i>
         </button>
 

@@ -1,5 +1,6 @@
 package com.deliverypp.services.payment;
 
+import com.deliverypp.models.DeliveryppParam;
 import com.deliverypp.models.StripeCustomer;
 import com.deliverypp.models.User;
 import com.deliverypp.services.params.DeliveryppParamService;
@@ -116,7 +117,8 @@ public class StripeServiceImpl implements StripeService {
                 int dollarInDop = 5480;
 
                 if(paramResponse.isSuccess()) {
-                    String paramValue = (String) paramResponse.getResponse();
+                    DeliveryppParam deliveryppParam = (DeliveryppParam) paramResponse.getResponse();
+                    String paramValue = deliveryppParam.getValue();
                     dollarInDop = Integer.parseInt(paramValue);
                 }
 

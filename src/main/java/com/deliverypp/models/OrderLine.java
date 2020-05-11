@@ -26,6 +26,9 @@ public class OrderLine {
     @Column(nullable = false)
     private int quantity;
 
+    @Column(nullable = false)
+    private int total;
+
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
@@ -78,5 +81,13 @@ public class OrderLine {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public int getTotal() {
+        return total;
+    }
+
+    public void setTotal(int total) {
+        this.total = total;
     }
 }
