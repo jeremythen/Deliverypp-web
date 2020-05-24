@@ -3,6 +3,7 @@ package com.deliverypp.services.stripe;
 import com.deliverypp.models.StripeCustomer;
 import com.deliverypp.models.User;
 import com.deliverypp.repositories.StripeCustomerRepository;
+import com.deliverypp.util.DeliveryppLoggin;
 import com.deliverypp.util.DeliveryppResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@DeliveryppLoggin
 public class StripeCustomerServiceImpl implements StripeCustomerService {
 
     private StripeCustomerRepository stripeCustomerRepository;

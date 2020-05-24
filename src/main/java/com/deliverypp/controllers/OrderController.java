@@ -80,7 +80,7 @@ public class OrderController {
 
     }
 
-    @PutMapping()
+    //@PutMapping()
     public ResponseEntity<?> updateOrder(@Valid @RequestBody Order order) {
 
         DeliveryppResponse<Order> oldOrderResponse = orderService.getOrderById(order.getId());

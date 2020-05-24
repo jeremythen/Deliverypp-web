@@ -3,6 +3,7 @@ package com.deliverypp.services.product;
 import com.deliverypp.controllers.OrderController;
 import com.deliverypp.models.Product;
 import com.deliverypp.repositories.ProductRepository;
+import com.deliverypp.util.DeliveryppLoggin;
 import com.deliverypp.util.DeliveryppResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -100,8 +101,6 @@ public class ProductServiceImpl implements ProductService {
         DeliveryppResponse<Product> response = new DeliveryppResponse<>();
 
         Optional<Product> oldProductOptional = productRepository.findById(product.getId());
-
-
 
         if(oldProductOptional.isPresent()) {
 

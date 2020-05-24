@@ -99,4 +99,18 @@ public class Address {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+    @Override
+    public String toString() {
+        return "Address{" +
+                "id=" + id +
+                ", country='" + country + '\'' +
+                ", city='" + city + '\'' +
+                ", streetAddress='" + streetAddress + '\'' +
+                ", postalCode=" + postalCode +
+                ", userName=" + user.getUsername() +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                '}';
+    }
 }

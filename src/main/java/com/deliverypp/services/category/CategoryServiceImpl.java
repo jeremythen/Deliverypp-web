@@ -2,6 +2,7 @@ package com.deliverypp.services.category;
 
 import com.deliverypp.models.Category;
 import com.deliverypp.repositories.CategoryRepository;
+import com.deliverypp.util.DeliveryppLoggin;
 import com.deliverypp.util.DeliveryppResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ import static com.deliverypp.util.DeliveryppResponse.ERROR;
 import static com.deliverypp.util.DeliveryppResponse.SUCCESS;
 
 @Service
+@DeliveryppLoggin
 public class CategoryServiceImpl implements CategoryService {
 
     private CategoryRepository categoryRepository;

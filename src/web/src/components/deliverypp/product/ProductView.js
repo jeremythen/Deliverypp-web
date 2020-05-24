@@ -14,6 +14,7 @@ import Modal from '../../common/Modal';
 import ProductActionForm from './ProductActionForm';
 
 import Alert from '../../common/Alert';
+import { batch } from "react-redux";
 
 function ProductView() {
 

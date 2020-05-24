@@ -2,6 +2,7 @@ package com.deliverypp.services.params;
 
 import com.deliverypp.models.DeliveryppParam;
 import com.deliverypp.repositories.DeliveryppParamRepository;
+import com.deliverypp.util.DeliveryppLoggin;
 import com.deliverypp.util.DeliveryppResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@DeliveryppLoggin
 public class DeliveryppParamServiceImpl implements DeliveryppParamService {
 
     private DeliveryppParamRepository deliveryppParamRepository;

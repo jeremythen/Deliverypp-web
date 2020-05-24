@@ -6,6 +6,7 @@ import com.deliverypp.models.User;
 import com.deliverypp.services.params.DeliveryppParamService;
 import com.deliverypp.services.stripe.StripeCustomerService;
 import com.deliverypp.services.user.UserService;
+import com.deliverypp.util.DeliveryppLoggin;
 import com.deliverypp.util.DeliveryppResponse;
 import static com.deliverypp.util.DeliveryppResponse.*;
 import static com.deliverypp.util.DeliveryppResponseStatus.*;
@@ -19,10 +20,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class StripeServiceImpl implements StripeService {
@@ -47,6 +47,7 @@ public class StripeServiceImpl implements StripeService {
     }
 
     @Override
+    @DeliveryppLoggin
     public DeliveryppResponse<?> createStripeCustomer(User user) {
 
         Stripe.apiKey = stripeApiKey;
@@ -89,14 +90,25 @@ public class StripeServiceImpl implements StripeService {
     }
 
     @Override
+    @DeliveryppLoggin
     public DeliveryppResponse<?> makePayment(Map<String, Object> requestMap) {
+
         Stripe.apiKey = stripeApiKey;
 
-        String stripeCustomerId = (String) requestMap.get("stripeCustomerId");
+        Map<String, Object> validationMap = validatePaymentParams(requestMap);
 
-        // TODO: Validate parameters
+        if(!(boolean)validationMap.get("valid")) {
+            return DeliveryppResponse.newResponse()
+                    .setStatus(ERROR)
+                    .setMessage("Payment params not valid.")
+                    .setSpecificStatus(PAYMENT_PARAMS_INVALID)
+                    .setResponse(validationMap);
+        }
 
         try {
+
+            String stripeCustomerId = (String) requestMap.get("stripeCustomerId");
+            String amountString = (String) requestMap.get("amount");
 
             Optional<Customer> optionalCustomer = getStripeCustomer(stripeCustomerId);
 
@@ -105,8 +117,6 @@ public class StripeServiceImpl implements StripeService {
                 Customer customer = optionalCustomer.get();
 
                 Map<String, Object> paymentParam = new HashMap<>();
-
-                String amountString = (String) requestMap.get("amount");
 
                 int amount = Integer.parseInt(amountString);
 
@@ -149,7 +159,36 @@ public class StripeServiceImpl implements StripeService {
 
     }
 
+    private Map<String, Object> validatePaymentParams(Map<String, Object> requestMap) {
+
+        Map<String, Object> validateMap = new HashMap<>();
+
+        List<String> validationMessages = new ArrayList<>();
+
+        String stripeCustomerId = (String) requestMap.get("stripeCustomerId");
+        String amountString = (String) requestMap.get("amount");
+
+        boolean isValid = true;
+
+        if(StringUtils.isEmpty(stripeCustomerId)) {
+            validationMessages.add("stripeCustomerId is required");
+            isValid = false;
+        }
+
+        if(StringUtils.isEmpty(amountString)) {
+            validationMessages.add("amountString is required");
+            isValid = false;
+        }
+
+        validateMap.put("valid", isValid);
+        validateMap.put("validationMessages", validationMessages);
+
+        return validateMap;
+
+    }
+
     @Override
+    @DeliveryppLoggin
     public DeliveryppResponse<?> getCustomer(String email) {
 
         Stripe.apiKey = stripeApiKey;
@@ -176,6 +215,7 @@ public class StripeServiceImpl implements StripeService {
     }
 
     @Override
+    @DeliveryppLoggin
     public DeliveryppResponse<?> addCard(Map<String, Object> requestMap) {
 
         logger.info("addCard requestMap: {}", requestMap);
@@ -259,6 +299,7 @@ public class StripeServiceImpl implements StripeService {
 
     }
 
+    @DeliveryppLoggin
     private Optional<Customer> getStripeCustomer(String stripeCustomerId) {
         logger.info("getStripeCustomer stripeCustomerId: {}", stripeCustomerId);
         try {

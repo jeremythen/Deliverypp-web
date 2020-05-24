@@ -80,4 +80,15 @@ public class DeliveryppResponse<T> {
     public void setSuccess(boolean success) {
         isSuccess = success;
     }
+
+    @Override
+    public String toString() {
+        return "DeliveryppResponse{" +
+                "status='" + status + '\'' +
+                ", message='" + message + '\'' +
+                ", specificStatus=" + specificStatus +
+                ", response=" + response +
+                ", isSuccess=" + isSuccess +
+                '}';
+    }
 }

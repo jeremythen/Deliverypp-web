@@ -90,4 +90,17 @@ public class OrderLine {
     public void setTotal(int total) {
         this.total = total;
     }
+
+    @Override
+    public String toString() {
+        return "OrderLine{" +
+                "id=" + id +
+                ", orderId=" + order.getId() +
+                ", product=" + product +
+                ", quantity=" + quantity +
+                ", total=" + total +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                '}';
+    }
 }

@@ -42,4 +42,13 @@ public class StripeCustomer {
         this.user = user;
         return this;
     }
+
+    @Override
+    public String toString() {
+        return "StripeCustomer{" +
+                "id=" + id +
+                ", stripeCustomerId='" + stripeCustomerId + '\'' +
+                ", userName=" + user.getUsername() +
+                '}';
+    }
 }

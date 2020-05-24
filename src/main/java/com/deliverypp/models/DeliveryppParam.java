@@ -61,4 +61,15 @@ public class DeliveryppParam {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+    @Override
+    public String toString() {
+        return "DeliveryppParam{" +
+                "id=" + id +
+                ", key='" + key + '\'' +
+                ", value='" + value + '\'' +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                '}';
+    }
 }

@@ -111,4 +111,19 @@ public class Order {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+    @Override
+    public String toString() {
+        return "Order{" +
+                "id=" + id +
+                ", userName=" + user.getUsername() +
+                ", total=" + total +
+                ", status='" + status + '\'' +
+                ", location=" + location +
+                ", comment='" + comment + '\'' +
+                ", orderLines=" + orderLines +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                '}';
+    }
 }
