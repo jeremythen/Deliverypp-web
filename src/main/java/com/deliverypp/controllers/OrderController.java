@@ -14,8 +14,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import com.deliverypp.util.DeliveryppResponse;
 
@@ -80,7 +82,7 @@ public class OrderController {
 
     }
 
-    //@PutMapping()
+    //vvvvv@PutMapping()
     public ResponseEntity<?> updateOrder(@Valid @RequestBody Order order) {
 
         DeliveryppResponse<Order> oldOrderResponse = orderService.getOrderById(order.getId());
@@ -133,7 +135,7 @@ public class OrderController {
 
         User userMakingRequest = userRequestInfoServiceResponse.getResponse();
 
-        boolean isNotAdmin = !Roles.ADMIN.name().equals(userMakingRequest.getRole());
+        boolean isNotAdmin = !Roles.isAdmin(userMakingRequest);
         boolean isNotUsersOrders = user.getId() != userMakingRequest.getId();
 
         logger.info("user: {}", user);

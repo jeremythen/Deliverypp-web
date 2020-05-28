@@ -24,6 +24,8 @@ public class Category {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    private String imageUrl;
+
     public int getId() {
         return id;
     }
@@ -62,6 +64,14 @@ public class Category {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String categoryImage) {
+        this.imageUrl = categoryImage;
     }
 
     @Override
