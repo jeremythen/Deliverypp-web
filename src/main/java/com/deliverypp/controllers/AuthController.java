@@ -41,25 +41,32 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody User user) {
 
+        String password = user.getPassword();
+        String username = user.getUsername();
+
         logger.info("register user {}", user);
 
-        DeliveryppResponse<User> response = userService.save(user);
+        DeliveryppResponse<?> response = userService.save(user);
 
         if(!response.isSuccess()) {
             return ResponseEntity.badRequest().body(response);
+        }
+
+        DeliveryppResponse<?> loginResponse = login(username, password);
+
+        if(loginResponse.isSuccess()) {
+            DeliveryppResponse<Object> newResponse = DeliveryppResponse.newResponse();
+            newResponse.setStatus(response.getStatus());
+            newResponse.setMessage(response.getMessage());
+            newResponse.setResponse(loginResponse.getResponse());
+            return ResponseEntity.ok(newResponse);
         }
 
         return ResponseEntity.ok(response);
 
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, Object> userMap) {
-
-        logger.info("login username: {}", userMap.get("username"));
-
-        String username = (String) userMap.get("username");
-        String password = (String) userMap.get("password");
+    private DeliveryppResponse<?> login(String username, String password) {
 
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(username, password)
@@ -79,9 +86,23 @@ public class AuthController {
         responseMap.put("user", userResponse.getResponse());
 
         DeliveryppResponse<?> response = DeliveryppResponse.newResponse()
-                                .setStatus(DeliveryppResponse.SUCCESS)
-                                .setMessage("User logged in successfully")
-                                .setResponse(responseMap);
+                .setStatus(DeliveryppResponse.SUCCESS)
+                .setMessage("User logged in successfully")
+                .setResponse(responseMap);
+
+        return response;
+
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody Map<String, String> userMap) {
+
+        logger.info("login username: {}", userMap.get("username"));
+
+        String username =userMap.get("username");
+        String password = userMap.get("password");
+
+        DeliveryppResponse<?> response = login(username, password);
 
         return ResponseEntity.ok(response);
 
