@@ -116,7 +116,7 @@ function LoginForm({ onLogin = () => {} }) {
                         invalid={dirty.password && !isValidPassword}
                         type="password"
                         name="password"
-                        id="examplePassword"
+                        id="password"
                         placeholder="********"
                         value={password}
                         onChange={onPasswordInputChange}

@@ -13,8 +13,8 @@ public class MailConfiguration {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
         mailSender.setHost("smtp.gmail.com");
         mailSender.setPort(25);
-        mailSender.setUsername("iletknowapp@gmail.com");
-        mailSender.setPassword("zstegexqsgmjawup");
+        mailSender.setUsername("");
+        mailSender.setPassword("");
         return mailSender;
 
     }

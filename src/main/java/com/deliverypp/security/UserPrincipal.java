@@ -6,10 +6,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class UserPrincipal implements UserDetails {
 
@@ -42,16 +39,13 @@ public class UserPrincipal implements UserDetails {
 
         List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
         grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_" + user.getRole()));
-
-        List<GrantedAuthority> authorities = grantedAuthorities;
-
         return new UserPrincipal(
                 user.getId(),
                 user.getName(),
                 user.getUsername(),
                 user.getEmail(),
                 user.getPassword(),
-                authorities
+                grantedAuthorities
         );
     }
 
